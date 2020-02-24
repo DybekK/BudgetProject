@@ -1,23 +1,37 @@
 import React from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
 } from 'react-native';
-
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {Button, Block, Accordion, NavBar} from 'galio-framework';
 import Login from './components/login/Login';
+import {NavigationContainer} from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Test from './components/Test';
+import Register from './components/register/Register';
+
+const Stack = createStackNavigator();
 
 const App: () => React$Node = () => {
   return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <Login />
-    </>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen
+            name="Login"
+            options={{
+                gestureDirection: 'horizontal'
+            }}
+        >
+          {props => <Login {...props} />}
+        </Stack.Screen>
+        <Stack.Screen
+            name="Register"
+            options={{
+                gestureDirection: 'horizontal'
+            }}
+        >
+            {props => <Register {...props} />}
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

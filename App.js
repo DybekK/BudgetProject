@@ -43,10 +43,19 @@ const App: () => React$Node = () => {
         }
     );
 
-    const postData = async (data) => {
+    const signInRequest = async (data) => {
         try {
             const response = await axios.post(`${url}/api/login_check`, data);
                 return await response.data.token;
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const signUpRequest = async (data) => {
+        try {
+            const response = await axios.post(`${url}/api/register`, data);
+                return await response.data;
         } catch (e) {
             console.log(e);
         }
@@ -69,16 +78,21 @@ const App: () => React$Node = () => {
 
     const authContext = useMemo(() => ({
         signIn: async data => {
-            const token = await postData(data);
+            const token = await signInRequest(data);
             if(token !== undefined) {
                 await AsyncStorage.setItem('userToken', token);
                 console.log(await AsyncStorage.getItem('userToken'));
                 dispatch({type: 'SIGN_IN', token: token });
             }
         },
+
         signOut: () => dispatch({type: 'SIGN_OUT'}),
+
         signUp: async data => {
-            dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'})
+            console.log(data);
+            const registerResponse = await signUpRequest(data);
+            console.log(registerResponse);
+            //dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'})
         }
     }), []);
 

@@ -9,7 +9,8 @@ import Register from './components/register/Register';
 import Text from 'galio-framework/src/Text';
 
 const Stack = createStackNavigator();
-const AuthContext = createContext();
+const url = 'http://localhost:8000/api/login_check';
+export const AuthContext = createContext();
 
 const App: () => React$Node = () => {
     const [state, dispatch] = useReducer(
@@ -42,6 +43,25 @@ const App: () => React$Node = () => {
         }
     );
 
+    const postData = async (url, data) => {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const meh = await response.json();
+            console.log(meh);
+        } catch (e) {
+            console.log(e);
+        }
+
+
+    }
+
     useEffect(() => {
         const bootstrapAsync = async () => {
             let userToken;
@@ -59,6 +79,9 @@ const App: () => React$Node = () => {
 
     const authContext = useMemo(() => ({
         signIn: async data => {
+            console.log(data);
+            //await postData(url, data);
+            await postData();
             dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
         },
         signOut: () => dispatch({type: 'SIGN_OUT'}),

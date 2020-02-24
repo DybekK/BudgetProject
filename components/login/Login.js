@@ -1,16 +1,21 @@
-import React from 'react';
+import React, {useState, useContext} from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 import {Block, Text, Button} from 'galio-framework';
 import TopGradient from '../../assets/images/TopGradient';
 import Google from '../../assets/images/Google';
 import {SvgCss} from 'react-native-svg';
 import Input from 'galio-framework/src/Input';
-
+import { AuthContext } from '../../App'
 const Login = (props) => {
   const { navigation } = props;
-  const navigateTest = () => {
+  const { signIn } = useContext(AuthContext);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+
+  const navigateToRegister = () => {
     navigation.navigate('Register');
-  }
+  };
 
   return (
     <>
@@ -33,9 +38,9 @@ const Login = (props) => {
           </Text>
         </View>
         <Block shadow style={styles.block} center>
-          <Input placeholder="Username or email address" />
-          <Input placeholder="Password" password viewPass />
-          <Button style={[styles.buttonMargin, styles.buttons]}>Sign in</Button>
+          <Input onChangeText={setUsername} placeholder="Username or email address" />
+          <Input onChangeText={setPassword} placeholder="Password" password viewPass />
+          <Button onPress={() => signIn({username, password})} style={[styles.buttonMargin, styles.buttons]}>Sign in</Button>
           <Button
             color="transparent"
             style={[styles.buttons, styles.googleButton]}>
@@ -47,7 +52,7 @@ const Login = (props) => {
         </Block>
         <Block style={{display: 'flex', flexDirection: 'row', marginVertical: 10}}>
           <Text color="#5d6363" style={{marginRight: 20}}>Don't you have an account?</Text>
-          <Text color="#6f37b8" onPress={navigateTest}>Sign up Now!</Text>
+          <Text color="#6f37b8" onPress={navigateToRegister}>Sign up Now!</Text>
         </Block>
       </SafeAreaView>
     </>

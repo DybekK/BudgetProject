@@ -9,7 +9,7 @@ import { Checkbox } from 'galio-framework';
 
 const Register = (props) => {
   const { navigation } = props;
-  const navigateTest = () => {
+  const navigateToLogin = () => {
     navigation.navigate('Login');
   }
 
@@ -45,7 +45,7 @@ const Register = (props) => {
         </Block>
         <Block style={{display: 'flex', flexDirection: 'row', marginVertical: 10}}>
           <Text color="#5d6363" style={{marginRight: 20}}>Don't you have an account?</Text>
-          <Text color="#6f37b8" onPress={navigateTest}>Sign up Now!</Text>
+          <Text color="#6f37b8" onPress={navigateToLogin}>Sign up Now!</Text>
         </Block>
       </SafeAreaView>
     </>

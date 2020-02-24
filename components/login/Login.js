@@ -46,7 +46,7 @@ const Login = (props) => {
           </Button>
         </Block>
         <Block style={{display: 'flex', flexDirection: 'row', marginVertical: 10}}>
-          <Text color="#6e7475" style={{marginRight: 20}}>Don't you have an account?</Text>
+          <Text color="#5d6363" style={{marginRight: 20}}>Don't you have an account?</Text>
           <Text color="#6f37b8" onPress={navigateTest}>Sign up Now!</Text>
         </Block>
       </SafeAreaView>
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     color: '#5d5b59',
   },
   buttonMargin: {
-    marginVertical: 30,
+    marginVertical: 15,
   },
 });
 

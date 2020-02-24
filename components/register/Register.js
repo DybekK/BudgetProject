@@ -39,12 +39,12 @@ const Register = (props) => {
           <Input placeholder="Password" password viewPass />
           <Input placeholder="Confirm password" password viewPass />
           <Block style={{width: '100%', marginTop: 15}}>
-            <Checkbox color="primary" label="I accept the Terms of Service" />
+            <Checkbox labelStyle={{ color: '#5d6363' }} color="primary" label="I accept the Terms of Service" />
           </Block>
           <Button style={[styles.buttonMargin, styles.buttons]}>Sign up</Button>
         </Block>
         <Block style={{display: 'flex', flexDirection: 'row', marginVertical: 10}}>
-          <Text color="#6e7475" style={{marginRight: 20}}>Don't you have an account?</Text>
+          <Text color="#5d6363" style={{marginRight: 20}}>Don't you have an account?</Text>
           <Text color="#6f37b8" onPress={navigateTest}>Sign up Now!</Text>
         </Block>
       </SafeAreaView>

@@ -6,10 +6,10 @@ import {NavigationContainer} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Test from './components/Test';
 import Register from './components/register/Register';
-import Text from 'galio-framework/src/Text';
+import axios from 'axios';
 
 const Stack = createStackNavigator();
-const url = 'http://localhost:8000/api/login_check';
+const url = 'http://192.168.1.187:8000';
 export const AuthContext = createContext();
 
 const App: () => React$Node = () => {
@@ -43,34 +43,24 @@ const App: () => React$Node = () => {
         }
     );
 
-    const postData = async (url, data) => {
+    const postData = async (data) => {
         try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            const meh = await response.json();
-            console.log(meh);
+            const response = await axios.post(`${url}/api/login_check`, data);
+                return await response.data.token;
         } catch (e) {
             console.log(e);
         }
-
-
-    }
+    };
 
     useEffect(() => {
         const bootstrapAsync = async () => {
             let userToken;
 
-            try {
-                userToken = await AsyncStorage.getItem('userToken');
-            } catch (e) {
-                console.log(e);
-            }
+            // try {
+            //     userToken = await AsyncStorage.getItem('userToken');
+            // } catch (e) {
+            //     console.log(e);
+            // }
 
             dispatch({type: 'RESTORE_TOKEN', token: userToken});
         }
@@ -79,10 +69,12 @@ const App: () => React$Node = () => {
 
     const authContext = useMemo(() => ({
         signIn: async data => {
-            console.log(data);
-            //await postData(url, data);
-            await postData();
-            dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
+            const token = await postData(data);
+            if(token !== undefined) {
+                await AsyncStorage.setItem('userToken', token);
+                console.log(await AsyncStorage.getItem('userToken'));
+                dispatch({type: 'SIGN_IN', token: token });
+            }
         },
         signOut: () => dispatch({type: 'SIGN_OUT'}),
         signUp: async data => {

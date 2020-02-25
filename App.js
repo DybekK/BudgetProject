@@ -15,7 +15,9 @@ import Register from './components/register/Register';
 import axios from 'axios';
 
 const Stack = createStackNavigator();
-const url = 'http://192.168.43.17:8000';
+const url = 'http://192.168.1.187:8000';
+
+
 export const AuthContext = createContext();
 
 const App: () => React$Node = () => {
@@ -40,12 +42,18 @@ const App: () => React$Node = () => {
             isSignout: true,
             userToken: null,
           };
+        case 'AUTH_ERROR':
+          return {
+            ...prevState,
+            authError: action.status
+          }
       }
     },
     {
       isLoading: true,
       isSignout: false,
       userToken: null,
+      authError: null
     },
   );
 
@@ -53,10 +61,23 @@ const App: () => React$Node = () => {
     try {
       const response = await axios.post(`${url}/api/login_check`, data);
       return await response.data.token;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      if (err.response) {
+        // Request made and server responded
+        // console.log(err.response.data);
+        //console.log('masnoooo niii' + err.response.status);
+        // console.log(err.response.headers);
+        dispatch({type: 'AUTH_ERROR', status: err.response.status});
+      } else if (err.request) {
+        // The request was made but no response was received
+        console.log(err.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', err.message);
+      }
     }
   };
+
 
   const signUpRequest = async data => {
     try {
@@ -67,39 +88,40 @@ const App: () => React$Node = () => {
     }
   };
 
-  useEffect(() => {
-    const bootstrapAsync = async () => {
-      let userToken;
+  console.log('keeeee' + state.authError);
 
-      // try {
-      //     userToken = await AsyncStorage.getItem('userToken');
-      // } catch (e) {
-      //     console.log(e);
-      // }
-
-      dispatch({type: 'RESTORE_TOKEN', token: userToken});
-    };
-    bootstrapAsync();
-  }, []);
+  // useEffect(() => {
+  //   const bootstrapAsync = async () => {
+  //     let userToken;
+  //
+  //     // try {
+  //     //     userToken = await AsyncStorage.getItem('userToken');
+  //     // } catch (e) {
+  //     //     console.log(e);
+  //     // }
+  //
+  //     dispatch({type: 'RESTORE_TOKEN', token: userToken});
+  //   };
+  //   bootstrapAsync();
+  // }, []);
 
   const authContext = useMemo(
     () => ({
       signIn: async data => {
         const token = await signInRequest(data);
-        if (token !== undefined) {
-          await AsyncStorage.setItem('userToken', token);
-          console.log(await AsyncStorage.getItem('userToken'));
-          dispatch({type: 'SIGN_IN', token: token});
-        }
+        console.log(token);
+      if(token !== undefined){
+        await AsyncStorage.setItem('userToken', token);
+        console.log(await AsyncStorage.getItem('userToken'));
+        dispatch({type: 'SIGN_IN', token: token});
+      }
       },
 
       signOut: () => dispatch({type: 'SIGN_OUT'}),
 
       signUp: async data => {
-        console.log(data);
         const registerResponse = await signUpRequest(data);
-        console.log(registerResponse);
-        //dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'})
+        dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'})
       },
     }),
     [],
@@ -112,22 +134,16 @@ const App: () => React$Node = () => {
 
   return (
     <NavigationContainer>
-      <AuthContext.Provider value={authContext}>
+      <AuthContext.Provider value={{...authContext, state}}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
           {state.userToken == null ? (
             <>
               <Stack.Screen
-                name="Login"
-                options={{
-                  gestureDirection: 'horizontal',
-                }}>
+                name="Login">
                 {props => <Login {...props} />}
               </Stack.Screen>
               <Stack.Screen
-                name="Register"
-                options={{
-                  gestureDirection: 'horizontal',
-                }}>
+                name="Register">
                 {props => <Register {...props} />}
               </Stack.Screen>
             </>

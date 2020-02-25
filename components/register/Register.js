@@ -12,20 +12,20 @@ import {useForm, Controller} from 'react-hook-form';
 const Register = props => {
   const {signUp} = useContext(AuthContext);
   const {navigation} = props;
-  const {register, setValue, handleSubmit, errors, control} = useForm();
+  const {handleSubmit, errors, control} = useForm();
 
   const onSubmit = data => {
-    console.log(data);
+    signUp(data);
   };
 
-  const onChange = args => {
+  const onChange = (args) => {
     return {
       value: args[0].nativeEvent.text,
     };
   };
 
   const navigateToLogin = () => {
-    navigation.navigate('Login');
+    navigation.goBack();
   };
 
   return (
@@ -100,6 +100,8 @@ const Register = props => {
                 color={errors.password && 'red'}
                 placeholderTextColor={errors.password && 'red'}
                 placeholder="Password"
+                password
+                viewPass
               />
             }
             control={control}
@@ -118,6 +120,8 @@ const Register = props => {
                 color={errors.passwordRepeat && 'red'}
                 placeholderTextColor={errors.passwordRepeat && 'red'}
                 placeholder="Repeat Password"
+                password
+                viewPass
               />
             }
             control={control}
@@ -141,14 +145,13 @@ const Register = props => {
               control={control}
               name="acceptTerms"
               onChange={([selected]) => {
-                // React Select return object instead of value for selection
                 return {value: selected};
               }}
               rules={{required: true}}
               defaultValue={false}
             />
             {errors.acceptTerms && (
-              <Text style={styles.errorInputText}>This field is required</Text>
+              <Text style={styles.errorInputText}>This field is requiredddd</Text>
             )}
           </Block>
           <Button

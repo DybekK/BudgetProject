@@ -6,15 +6,33 @@ import Google from '../../assets/images/Google';
 import {SvgCss} from 'react-native-svg';
 import Input from 'galio-framework/src/Input';
 import {AuthContext} from '../../App';
+import {Controller, useForm} from 'react-hook-form';
 const Login = props => {
   const {navigation} = props;
-  const {signIn} = useContext(AuthContext);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
+  const {signIn, state} = useContext(AuthContext);
+  const {handleSubmit, errors, control, setError} = useForm();
 
   const navigateToRegister = () => {
     navigation.navigate('Register');
+  };
+
+  const onSubmit = async data => {
+    await signIn(data);
+    errorInterceptor();
+  };
+
+  const onChange = args => {
+    return {
+      value: args[0].nativeEvent.text,
+    };
+  };
+
+  const errorInterceptor = () => {
+    console.log(state.authError);
+    if(state.authError === 401) {
+      setError('username', 'auth');
+      setError('password', 'auth');
+    }
   };
 
   return (
@@ -37,19 +55,60 @@ const Login = props => {
             Login to your account
           </Text>
         </View>
-        <Block shadow style={styles.block} center>
-          <Input
-            onChangeText={setUsername}
-            placeholder="Username or email address"
+        <Block shadow style={styles.block}>
+          <Controller
+              as={
+                <Input
+                    style={errors.username && {borderColor: 'red'}}
+                    color={errors.username && 'red'}
+                    placeholderTextColor={errors.username && 'red'}
+                    placeholder="Username"
+                />
+              }
+              control={control}
+              name="username"
+              onChange={onChange}
+              rules={{required: true, auth: true}}
+              defaultValue=""
           />
-          <Input
-            onChangeText={setPassword}
-            placeholder="Password"
-            password
-            viewPass
+
+
+          {errors.username && errors.username.type === 'required' && (
+              <Text style={styles.errorInputText}>This field is required</Text>
+          )}
+
+
+          <Controller
+              as={
+                <Input
+                    style={errors.password && {borderColor: 'red'}}
+                    color={errors.password && 'red'}
+                    placeholderTextColor={errors.password && 'red'}
+                    placeholder="Password"
+                    password
+                    viewPass
+                />
+              }
+              control={control}
+              name="password"
+              onChange={onChange}
+              rules={{required: true, auth: true}}
+              defaultValue=""
           />
+          {errors.password && errors.password.type === 'required' && (
+              <Text style={styles.errorInputText}>This field is required</Text>
+          )}
+
+          {errors.username && errors.username.type === 'auth' && (
+              <Text style={styles.errorInputText}>Username or password are incorrect</Text>
+          )}
+
+
+
+
           <Button
-            onPress={() => signIn({username, password})}
+              onPress={handleSubmit(onSubmit)}
+            // onPress={() => signIn({username, password})}
             style={[styles.buttonMargin, styles.buttons]}>
             Sign in
           </Button>
@@ -77,6 +136,10 @@ const Login = props => {
 };
 
 const styles = StyleSheet.create({
+  errorInputText: {
+    color: 'red',
+    fontSize: 13,
+  },
   containerFlex: {
     display: 'flex',
     marginHorizontal: 15,

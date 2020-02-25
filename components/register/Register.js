@@ -1,5 +1,5 @@
 import React, {useState, useContext} from 'react';
-import {SafeAreaView, StyleSheet, View, Alert} from 'react-native';
+import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';
 import {Block, Text, Button} from 'galio-framework';
 import TopGradient from '../../assets/images/TopGradient';
 import Google from '../../assets/images/Google';
@@ -7,23 +7,29 @@ import {SvgCss} from 'react-native-svg';
 import Input from 'galio-framework/src/Input';
 import {Checkbox} from 'galio-framework';
 import {AuthContext} from '../../App';
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 
 const Register = props => {
   const {signUp} = useContext(AuthContext);
   const {navigation} = props;
-  const {register, setValue, handleSubmit, errors} = useForm();
-  const onSubmit = data => console.log(data);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
+  const {register, setValue, handleSubmit, errors, control} = useForm();
+
+  const onSubmit = data => {
+    console.log(data);
+  };
+
+  const onChange = args => {
+    return {
+      value: args[0].nativeEvent.text,
+    };
+  };
 
   const navigateToLogin = () => {
     navigation.navigate('Login');
   };
 
   return (
-    <>
+    <ScrollView>
       <SvgCss
         style={[
           {position: 'absolute'},
@@ -42,44 +48,110 @@ const Register = props => {
             Create your own account
           </Text>
         </View>
-        <Block shadow style={styles.block} center>
-          <Input
-            ref={register({name: 'username'}, {required: true})}
-            onChangeText={text => setValue('username', text, true)}
-            placeholder="Username"
+        <Block shadow style={styles.block}>
+          <Controller
+            as={
+              <Input
+                style={errors.username && {borderColor: 'red'}}
+                color={errors.username && 'red'}
+                placeholderTextColor={errors.username && 'red'}
+                placeholder="Username"
+              />
+            }
+            control={control}
+            name="username"
+            onChange={onChange}
+            rules={{required: true}}
+            defaultValue=""
           />
-          {errors.username && <Text>This field is required</Text>}
-          <Input
-            ref={register({name: 'email'}, {required: true})}
-            onChangeText={text => setValue('email', text, true)}
-            placeholder="Email Address"
+          {errors.username && (
+            <Text style={styles.errorInputText}>This field is required</Text>
+          )}
+          <Controller
+            as={
+              <Input
+                style={errors.email && {borderColor: 'red'}}
+                color={errors.email && 'red'}
+                placeholderTextColor={errors.email && 'red'}
+                placeholder="Email"
+              />
+            }
+            control={control}
+            name="email"
+            onChange={onChange}
+            rules={{
+              required: true,
+              pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+            }}
+            defaultValue=""
           />
-          {errors.email && <Text>This field is required</Text>}
-          <Input
-            ref={register({name: 'password'}, {required: true})}
-            onChangeText={text => setValue('password', text, true)}
-            placeholder="Password"
-            password
-            viewPass
+
+          {errors.email && errors.email.type === 'required' && (
+            <Text style={styles.errorInputText}>This field is required</Text>
+          )}
+
+          {errors.email && errors.email.type === 'pattern' && (
+            <Text style={styles.errorInputText}>Email format is incorrect</Text>
+          )}
+          <Controller
+            as={
+              <Input
+                style={errors.password && {borderColor: 'red'}}
+                color={errors.password && 'red'}
+                placeholderTextColor={errors.password && 'red'}
+                placeholder="Password"
+              />
+            }
+            control={control}
+            name="password"
+            onChange={onChange}
+            rules={{required: true}}
+            defaultValue=""
           />
-          {errors.password && <Text>This field is required</Text>}
-          <Input
-            ref={register({name: 'passwordRepeat'}, {required: true})}
-            onChangeText={text => setValue('passwordRepeat', text, true)}
-            placeholder="Confirm password"
-            password
-            viewPass
+          {errors.password && (
+            <Text style={styles.errorInputText}>This field is required</Text>
+          )}
+          <Controller
+            as={
+              <Input
+                style={errors.passwordRepeat && {borderColor: 'red'}}
+                color={errors.passwordRepeat && 'red'}
+                placeholderTextColor={errors.passwordRepeat && 'red'}
+                placeholder="Repeat Password"
+              />
+            }
+            control={control}
+            name="passwordRepeat"
+            onChange={onChange}
+            rules={{required: true}}
+            defaultValue=""
           />
-          {errors.passwordRepeat && <Text>This field is required</Text>}
+          {errors.passwordRepeat && (
+            <Text style={styles.errorInputText}>This field is required</Text>
+          )}
           <Block style={{width: '100%', marginTop: 15}}>
-            <Checkbox
-              labelStyle={{color: '#5d6363'}}
-              color="primary"
-              label="I accept the Terms of Service"
+            <Controller
+              as={
+                <Checkbox
+                  labelStyle={{color: '#5d6363'}}
+                  color="primary"
+                  label="I accept the Terms of Service"
+                />
+              }
+              control={control}
+              name="acceptTerms"
+              onChange={([selected]) => {
+                // React Select return object instead of value for selection
+                return {value: selected};
+              }}
+              rules={{required: true}}
+              defaultValue={false}
             />
+            {errors.acceptTerms && (
+              <Text style={styles.errorInputText}>This field is required</Text>
+            )}
           </Block>
           <Button
-            //onPress={() => signUp({username, password, email})}
             onPress={handleSubmit(onSubmit)}
             style={[styles.buttonMargin, styles.buttons]}>
             Sign up
@@ -95,11 +167,15 @@ const Register = props => {
           </Text>
         </Block>
       </SafeAreaView>
-    </>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  errorInputText: {
+    color: 'red',
+    fontSize: 13,
+  },
   containerFlex: {
     display: 'flex',
     marginHorizontal: 15,

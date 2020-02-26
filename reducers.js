@@ -10,6 +10,7 @@ export const authReducer = (auth, action) => {
         return {
           ...auth,
           isSignout: false,
+          isLoading: true,
           userToken: action.token,
         };
       case 'SIGN_OUT':

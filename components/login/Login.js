@@ -36,9 +36,7 @@ const Login = props => {
   };
 
   const errorInterceptor = () => {
-    console.log('LOGIN 33 state.authError =  ' + auth.authError);
     if (auth.authError === 401) {
-      console.log('LOGIN 35 an error occured : 401, changing colors');
       setError('username', 'auth');
       setError('password', 'auth');
     }

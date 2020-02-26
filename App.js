@@ -10,9 +10,10 @@ import {createStackNavigator} from '@react-navigation/stack';
 import AsyncStorage from '@react-native-community/async-storage';
 //packages
 import axios from 'axios';
+import Spinner from 'react-native-loading-spinner-overlay';
 //components
 import Login from './components/login/Login';
-import Test from './components/Test';
+import Home from './components/home/Home';
 import Register from './components/register/Register';
 //project files
 import {authReducer} from './reducers';
@@ -22,7 +23,7 @@ const Stack = createStackNavigator();
 export const AuthContext = createContext({});
 
 const initialState = {
-  isLoading: true,
+  isLoading: false,
   isSignout: false,
   userToken: null,
   authError: null,
@@ -33,18 +34,17 @@ const App = () => {
 
   const signInRequest = async data => {
     try {
+      dispatch({type: 'AUTH_ERROR', status: null});
       const response = await axios.post(`${url}/api/login_check`, data);
       return await response.data.token;
     } catch (err) {
       if (err.response) {
-        console.log('sign in request ' + err.response.status);
         // Request made and server responded
         // console.log(err.response.data);
         //console.log('masnoooo niii' + err.response.status);
         // console.log(err.response.headers);
         dispatch({type: 'AUTH_ERROR', status: err.response.status});
         console.log(
-          'dispatched AUTH_ERROR err.response.status = ' + err.response.status,
         );
       } else if (err.request) {
         // The request was made but no response was received
@@ -69,7 +69,6 @@ const App = () => {
     () => ({
       signIn: async data => {
         const token = await signInRequest(data);
-        console.log('token  = ' + token);
         if (token !== undefined) {
           await AsyncStorage.setItem('userToken', token);
           console.log(await AsyncStorage.getItem('userToken'));
@@ -95,6 +94,11 @@ const App = () => {
   return (
     <NavigationContainer>
       <AuthContext.Provider value={{auth, ...authContext}}>
+      <Spinner
+          visible={auth.isLoading}
+          textContent={'Loading...'}
+          //textStyle={styles.spinnerTextStyle}
+        />
         <Stack.Navigator screenOptions={{headerShown: false}}>
           {auth.userToken == null ? (
             <>
@@ -106,7 +110,7 @@ const App = () => {
               </Stack.Screen>
             </>
           ) : (
-            <Stack.Screen name="Home" component={Test} />
+            <Stack.Screen name="Home" component={Home} />
           )}
         </Stack.Navigator>
       </AuthContext.Provider>

@@ -1,10 +1,13 @@
+//react
 import React, {useContext, useEffect} from 'react';
-import Text from 'galio-framework/src/Text';
-import {AuthContext} from '../App';
 import AsyncStorage from '@react-native-community/async-storage';
+//packages
+import Text from 'galio-framework/src/Text';
 import axios from 'axios';
-
-const Test = () => {
+//project files
+import {AuthContext} from '../../App';
+import {url} from '../../env';
+const Home = () => {
   const {signOut} = useContext(AuthContext);
   const [username, setUsername] = React.useState('');
 
@@ -20,7 +23,7 @@ const Test = () => {
     //     console.log(e);
     // }
 
-    const response = await fetch('http://192.168.43.17:8000/api/jwt/test', {
+    const response = await fetch(`${url}/api/jwt/test`, {
       method: 'GET',
       headers: {
         Authorization: 'Bearer ' + token,
@@ -42,4 +45,4 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default Home;

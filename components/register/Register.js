@@ -1,13 +1,16 @@
-import React, {useState, useContext} from 'react';
+//react
+import React, {useContext} from 'react';
 import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';
+//packages
 import {Block, Text, Button} from 'galio-framework';
-import TopGradient from '../../assets/images/TopGradient';
-import Google from '../../assets/images/Google';
-import {SvgCss} from 'react-native-svg';
 import Input from 'galio-framework/src/Input';
-import {Checkbox} from 'galio-framework';
-import {AuthContext} from '../../App';
 import {useForm, Controller} from 'react-hook-form';
+import {SvgCss} from 'react-native-svg';
+import {Checkbox} from 'galio-framework';
+//project files
+import TopGradient from '../../assets/images/TopGradient';
+import {AuthContext} from '../../App';
+
 
 const Register = props => {
   const {signUp} = useContext(AuthContext);

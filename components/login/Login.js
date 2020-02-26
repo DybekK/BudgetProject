@@ -1,25 +1,33 @@
-import React, {useState, useContext} from 'react';
+//react
+import React, {useEffect, useContext} from 'react';
 import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';
+//packages
 import {Block, Text, Button} from 'galio-framework';
+import Input from 'galio-framework/src/Input';
+import {SvgCss} from 'react-native-svg';
+import {Controller, useForm} from 'react-hook-form';
+//project files
 import TopGradient from '../../assets/images/TopGradient';
 import Google from '../../assets/images/Google';
-import {SvgCss} from 'react-native-svg';
-import Input from 'galio-framework/src/Input';
 import {AuthContext} from '../../App';
-import {Controller, useForm} from 'react-hook-form';
+
 const Login = props => {
   const {navigation} = props;
-  const {signIn, state} = useContext(AuthContext);
+  const {signIn, auth} = useContext(AuthContext);
   const {handleSubmit, errors, control, setError} = useForm();
+
+  useEffect(() => {
+    errorInterceptor();
+  }, [auth]);
 
   const navigateToRegister = () => {
     navigation.navigate('Register');
   };
 
   const onSubmit = async data => {
-    await signIn(data);
-    errorInterceptor();
+    signIn(data);
   };
+
 
   const onChange = args => {
     return {
@@ -28,8 +36,9 @@ const Login = props => {
   };
 
   const errorInterceptor = () => {
-    console.log(state.authError);
-    if(state.authError === 401) {
+    console.log('LOGIN 33 state.authError =  ' + auth.authError);
+    if (auth.authError === 401) {
+      console.log('LOGIN 35 an error occured : 401, changing colors');
       setError('username', 'auth');
       setError('password', 'auth');
     }
@@ -57,58 +66,54 @@ const Login = props => {
         </View>
         <Block shadow style={styles.block}>
           <Controller
-              as={
-                <Input
-                    style={errors.username && {borderColor: 'red'}}
-                    color={errors.username && 'red'}
-                    placeholderTextColor={errors.username && 'red'}
-                    placeholder="Username"
-                />
-              }
-              control={control}
-              name="username"
-              onChange={onChange}
-              rules={{required: true, auth: true}}
-              defaultValue=""
+            as={
+              <Input
+                style={errors.username && {borderColor: 'red'}}
+                color={errors.username && 'red'}
+                placeholderTextColor={errors.username && 'red'}
+                placeholder="Username"
+              />
+            }
+            control={control}
+            name="username"
+            onChange={onChange}
+            rules={{required: true, auth: true}}
+            defaultValue=""
           />
-
 
           {errors.username && errors.username.type === 'required' && (
-              <Text style={styles.errorInputText}>This field is required</Text>
+            <Text style={styles.errorInputText}>This field is required</Text>
           )}
 
-
           <Controller
-              as={
-                <Input
-                    style={errors.password && {borderColor: 'red'}}
-                    color={errors.password && 'red'}
-                    placeholderTextColor={errors.password && 'red'}
-                    placeholder="Password"
-                    password
-                    viewPass
-                />
-              }
-              control={control}
-              name="password"
-              onChange={onChange}
-              rules={{required: true, auth: true}}
-              defaultValue=""
+            as={
+              <Input
+                style={errors.password && {borderColor: 'red'}}
+                color={errors.password && 'red'}
+                placeholderTextColor={errors.password && 'red'}
+                placeholder="Password"
+                password
+                viewPass
+              />
+            }
+            control={control}
+            name="password"
+            onChange={onChange}
+            rules={{required: true, auth: true}}
+            defaultValue=""
           />
           {errors.password && errors.password.type === 'required' && (
-              <Text style={styles.errorInputText}>This field is required</Text>
+            <Text style={styles.errorInputText}>This field is required</Text>
           )}
 
           {errors.username && errors.username.type === 'auth' && (
-              <Text style={styles.errorInputText}>Username or password are incorrect</Text>
+            <Text style={styles.errorInputText}>
+              Username or password are incorrect
+            </Text>
           )}
 
-
-
-
           <Button
-              onPress={handleSubmit(onSubmit)}
-            // onPress={() => signIn({username, password})}
+            onPress={handleSubmit(onSubmit)}
             style={[styles.buttonMargin, styles.buttons]}>
             Sign in
           </Button>

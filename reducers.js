@@ -10,8 +10,8 @@ export const authReducer = (auth, action) => {
         return {
           ...auth,
           isSignout: false,
-          isLoading: true,
           userToken: action.token,
+          authError: false
         };
       case 'SIGN_OUT':
         return {
@@ -24,6 +24,11 @@ export const authReducer = (auth, action) => {
           ...auth,
           authError: action.status,
         };
+      case 'SET_LOADING':
+        return {
+          ...auth,
+          isLoading: action.loading
+        }
       default: 
         return state;
     }

@@ -13,8 +13,8 @@ import {AuthContext} from '../../App';
 
 const Login = props => {
   const {navigation} = props;
-  const {signIn, auth} = useContext(AuthContext);
-  const {handleSubmit, errors, control, setError} = useForm();
+  const {signIn, resetErrors, auth} = useContext(AuthContext);
+  const {handleSubmit, errors, control, setError, clearError} = useForm();
 
   useEffect(() => {
     errorInterceptor();
@@ -25,6 +25,8 @@ const Login = props => {
   };
 
   const onSubmit = async data => {
+    resetErrors();
+    clearError();
     signIn(data);
   };
 

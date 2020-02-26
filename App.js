@@ -30,11 +30,10 @@ const initialState = {
 };
 
 const App = () => {
-  const [auth, dispatch] = useReducer(authReducer ,initialState);
+  const [auth, dispatch] = useReducer(authReducer, initialState);
 
   const signInRequest = async data => {
     try {
-      dispatch({type: 'AUTH_ERROR', status: null});
       const response = await axios.post(`${url}/api/login_check`, data);
       return await response.data.token;
     } catch (err) {
@@ -68,12 +67,14 @@ const App = () => {
   const authContext = useMemo(
     () => ({
       signIn: async data => {
+        dispatch({type: 'SET_LOADING', loading: true});
         const token = await signInRequest(data);
         if (token !== undefined) {
           await AsyncStorage.setItem('userToken', token);
           console.log(await AsyncStorage.getItem('userToken'));
           dispatch({type: 'SIGN_IN', token: token});
-        }
+        } 
+        dispatch({type: 'SET_LOADING', loading: false});
       },
 
       signOut: () => dispatch({type: 'SIGN_OUT'}),
@@ -82,6 +83,9 @@ const App = () => {
         const registerResponse = await signUpRequest(data);
         dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
       },
+      resetErrors: () => {
+        dispatch({type: 'AUTH_ERROR', status: false});
+      }
     }),
     [],
   );
@@ -95,9 +99,10 @@ const App = () => {
     <NavigationContainer>
       <AuthContext.Provider value={{auth, ...authContext}}>
       <Spinner
+          //visible={auth.isLoading}
           visible={auth.isLoading}
-          textContent={'Loading...'}
-          //textStyle={styles.spinnerTextStyle}
+          //textContent={''}
+          textStyle={styles.spinnerTextStyle}
         />
         <Stack.Navigator screenOptions={{headerShown: false}}>
           {auth.userToken == null ? (

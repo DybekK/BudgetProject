@@ -16,10 +16,6 @@ const Login = props => {
   const {signIn, resetErrors, auth} = useContext(AuthContext);
   const {handleSubmit, errors, control, setError, clearError} = useForm();
 
-  useEffect(() => {
-    errorInterceptor();
-  }, [auth]);
-
   const navigateToRegister = () => {
     navigation.navigate('Register');
   };
@@ -44,6 +40,10 @@ const Login = props => {
     }
   };
 
+  useEffect(() => {
+    errorInterceptor();
+  }, [auth]);
+  
   return (
     <ScrollView>
       <SvgCss

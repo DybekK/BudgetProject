@@ -1,5 +1,5 @@
 //react
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';
 //packages
 import {Block, Text, Button} from 'galio-framework';
@@ -11,24 +11,21 @@ import {Checkbox} from 'galio-framework';
 import TopGradient from '../../assets/images/TopGradient';
 import {AuthContext} from '../../App';
 
-
 const Register = props => {
-  const {signUp} = useContext(AuthContext);
+  const {signUp, auth} = useContext(AuthContext);
   const {navigation} = props;
   const {handleSubmit, errors, control, setError} = useForm();
 
   const onSubmit = data => {
-    console.log(data);
-    if(data.password === data.passwordRepeat) {
-      console.log('takie same');
+    if (data.password === data.passwordRepeat) {
       signUp(data);
     } else {
-        setError('password', 'repeat');
-        setError('passwordRepeat', 'repeat');
+      setError('password', 'repeat');
+      setError('passwordRepeat', 'repeat');
     }
   };
 
-  const onChange = (args) => {
+  const onChange = args => {
     return {
       value: args[0].nativeEvent.text,
     };
@@ -37,6 +34,17 @@ const Register = props => {
   const navigateToLogin = () => {
     navigation.goBack();
   };
+
+  const errorInterceptor = () => {
+    if (auth.authError === 409) {
+      setError('username', 'existed');
+    }
+  };
+
+  useEffect(() => {
+    errorInterceptor();
+  }, [auth]);
+
 
   return (
     <ScrollView>
@@ -71,11 +79,17 @@ const Register = props => {
             control={control}
             name="username"
             onChange={onChange}
-            rules={{required: true}}
+            rules={{required: true, existed: true}}
             defaultValue=""
           />
-          {errors.username && (
+          {errors.username && errors.username.type === 'required' && (
             <Text style={styles.errorInputText}>This field is required</Text>
+          )}
+
+          {errors.username && errors.username.type === 'existed' && (
+            <Text style={styles.errorInputText}>
+              Username is already taken 
+            </Text>
           )}
           <Controller
             as={
@@ -92,6 +106,7 @@ const Register = props => {
             rules={{
               required: true,
               pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+              existed: true
             }}
             defaultValue=""
           />
@@ -117,7 +132,7 @@ const Register = props => {
             control={control}
             name="password"
             onChange={onChange}
-            rules={{required: true, repeat: true}}
+            rules={{required: true, repeat: true, existed: true}}
             defaultValue=""
           />
           {errors.password && errors.password.type === 'required' && (
@@ -137,12 +152,13 @@ const Register = props => {
             control={control}
             name="passwordRepeat"
             onChange={onChange}
-            rules={{required: true, repeat: true}}
+            rules={{required: true, repeat: true, existed: true}}
             defaultValue=""
           />
-          {errors.passwordRepeat && errors.passwordRepeat.type === 'required' && (
-            <Text style={styles.errorInputText}>This field is required</Text>
-          )}
+          {errors.passwordRepeat &&
+            errors.passwordRepeat.type === 'required' && (
+              <Text style={styles.errorInputText}>This field is required</Text>
+            )}
 
           {errors.password && errors.password.type === 'repeat' && (
             <Text style={styles.errorInputText}>
@@ -164,11 +180,13 @@ const Register = props => {
               onChange={([selected]) => {
                 return selected;
               }}
-              rules={{required: true}}
+              rules={{required: true, existed: true}}
               defaultValue={false}
             />
             {errors.acceptTerms && (
-              <Text style={styles.errorInputText}>You have to accept the terms</Text>
+              <Text style={styles.errorInputText}>
+                You have to accept the terms
+              </Text>
             )}
           </Block>
           <Button

@@ -33,6 +33,7 @@ const App = () => {
   const [auth, dispatch] = useReducer(authReducer, initialState);
 
   const signInRequest = async data => {
+    console.log(data);
     try {
       const response = await axios.post(`${url}/api/login_check`, data);
       return await response.data.token;
@@ -40,11 +41,9 @@ const App = () => {
       if (err.response) {
         // Request made and server responded
         // console.log(err.response.data);
-        //console.log('masnoooo niii' + err.response.status);
+        //console.log(err.response.status);
         // console.log(err.response.headers);
         dispatch({type: 'AUTH_ERROR', status: err.response.status});
-        console.log(
-        );
       } else if (err.request) {
         // The request was made but no response was received
         console.log(err.request);
@@ -58,9 +57,22 @@ const App = () => {
   const signUpRequest = async data => {
     try {
       const response = await axios.post(`${url}/api/register`, data);
-      return await response.data;
-    } catch (e) {
-      console.log(e);
+      return response.status;
+    } catch (err) {
+      if (err.response) {
+        // Request made and server responded
+        // console.log(err.response.data);
+        //console.log('masnoooo niii' + err.response.status);
+        // console.log(err.response.headers);
+        console.log(err.response.status);
+        dispatch({type: 'AUTH_ERROR', status: err.response.status});
+      } else if (err.request) {
+        // The request was made but no response was received
+        console.log(err.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', err.message);
+      }
     }
   };
 
@@ -76,12 +88,29 @@ const App = () => {
         } 
         dispatch({type: 'SET_LOADING', loading: false});
       },
-
+      signInAfterRegister: async data => {
+        const token = await signInRequest(data);
+        if (token !== undefined) {
+          await AsyncStorage.setItem('userToken', token);
+          console.log(await AsyncStorage.getItem('userToken'));
+          dispatch({type: 'SIGN_IN', token: token});
+        } 
+      },
       signOut: () => dispatch({type: 'SIGN_OUT'}),
 
       signUp: async data => {
+        dispatch({type: 'SET_LOADING', loading: true});
         const registerResponse = await signUpRequest(data);
-      //  dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
+        console.log(registerResponse);
+        if(registerResponse === 200) {
+          console.log(data);
+          const meh = {
+            username: data.username,
+            password: data.password
+          }
+          authContext.signInAfterRegister(meh);
+        }
+        dispatch({type: 'SET_LOADING', loading: false});
       },
       resetErrors: () => {
         dispatch({type: 'AUTH_ERROR', status: false});

@@ -45,7 +45,6 @@ const Register = props => {
     errorInterceptor();
   }, [auth]);
 
-
   return (
     <ScrollView>
       <SvgCss
@@ -66,7 +65,7 @@ const Register = props => {
             Create your own account
           </Text>
         </View>
-        <Block shadow style={styles.block}>
+        <Block style={styles.block}>
           <Controller
             as={
               <Input
@@ -87,9 +86,7 @@ const Register = props => {
           )}
 
           {errors.username && errors.username.type === 'existed' && (
-            <Text style={styles.errorInputText}>
-              Username is already taken 
-            </Text>
+            <Text style={styles.errorInputText}>Username is already taken</Text>
           )}
           <Controller
             as={
@@ -106,7 +103,7 @@ const Register = props => {
             rules={{
               required: true,
               pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-              existed: true
+              existed: true,
             }}
             defaultValue=""
           />

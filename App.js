@@ -1,9 +1,5 @@
 //react
-import React, {
-  createContext,
-  useReducer,
-  useMemo,
-} from 'react';
+import React, {createContext, useReducer, useMemo} from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -85,7 +81,7 @@ const App = () => {
           await AsyncStorage.setItem('userToken', token);
           console.log(await AsyncStorage.getItem('userToken'));
           dispatch({type: 'SIGN_IN', token: token});
-        } 
+        }
         dispatch({type: 'SET_LOADING', loading: false});
       },
       signInAfterRegister: async data => {
@@ -94,7 +90,7 @@ const App = () => {
           await AsyncStorage.setItem('userToken', token);
           console.log(await AsyncStorage.getItem('userToken'));
           dispatch({type: 'SIGN_IN', token: token});
-        } 
+        }
       },
       signOut: () => dispatch({type: 'SIGN_OUT'}),
 
@@ -102,19 +98,19 @@ const App = () => {
         dispatch({type: 'SET_LOADING', loading: true});
         const registerResponse = await signUpRequest(data);
         console.log(registerResponse);
-        if(registerResponse === 200) {
+        if (registerResponse === 200) {
           console.log(data);
           const meh = {
             username: data.username,
-            password: data.password
-          }
+            password: data.password,
+          };
           authContext.signInAfterRegister(meh);
         }
         dispatch({type: 'SET_LOADING', loading: false});
       },
       resetErrors: () => {
         dispatch({type: 'AUTH_ERROR', status: false});
-      }
+      },
     }),
     [],
   );
@@ -125,9 +121,9 @@ const App = () => {
   // }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer style={{backgroundColor: 'white'}}>
       <AuthContext.Provider value={{auth, ...authContext}}>
-      <Spinner
+        <Spinner
           //visible={auth.isLoading}
           visible={auth.isLoading}
           //textContent={''}
@@ -136,6 +132,7 @@ const App = () => {
         <Stack.Navigator screenOptions={{headerShown: false}}>
           {auth.userToken == null ? (
             <>
+              <Stack.Screen name="Home" component={Home} />
               <Stack.Screen name="Login">
                 {props => <Login {...props} />}
               </Stack.Screen>

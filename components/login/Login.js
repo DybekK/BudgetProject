@@ -26,7 +26,6 @@ const Login = props => {
     signIn(data);
   };
 
-
   const onChange = args => {
     return {
       value: args[0].nativeEvent.text,
@@ -43,7 +42,7 @@ const Login = props => {
   useEffect(() => {
     errorInterceptor();
   }, [auth]);
-  
+
   return (
     <ScrollView>
       <SvgCss
@@ -64,7 +63,7 @@ const Login = props => {
             Login to your account
           </Text>
         </View>
-        <Block shadow style={styles.block}>
+        <Block style={styles.block}>
           <Controller
             as={
               <Input
@@ -117,14 +116,14 @@ const Login = props => {
             style={[styles.buttonMargin, styles.buttons]}>
             Sign in
           </Button>
-          <Button
+          {/* <Button
             color="transparent"
             style={[styles.buttons, styles.googleButton]}>
             <SvgCss style={{position: 'absolute'}} height={35} xml={Google} />
             <Text style={[{flex: 1}, {fontSize: 16}]} center color="#dd4b39">
               Sign in with Google
             </Text>
-          </Button>
+          </Button> */}
         </Block>
         <Block
           style={{display: 'flex', flexDirection: 'row', marginVertical: 10}}>

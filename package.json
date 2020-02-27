@@ -19,6 +19,7 @@
     "react": "16.9.0",
     "react-hook-form": "^4.9.8",
     "react-native": "0.61.5",
+    "react-native-chart-kit": "^5.1.1",
     "react-native-gesture-handler": "^1.6.0",
     "react-native-loading-spinner-overlay": "^1.1.0",
     "react-native-reanimated": "^1.7.0",

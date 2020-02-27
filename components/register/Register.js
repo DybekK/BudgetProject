@@ -15,10 +15,17 @@ import {AuthContext} from '../../App';
 const Register = props => {
   const {signUp} = useContext(AuthContext);
   const {navigation} = props;
-  const {handleSubmit, errors, control} = useForm();
+  const {handleSubmit, errors, control, setError} = useForm();
 
   const onSubmit = data => {
-    signUp(data);
+    console.log(data);
+    if(data.password === data.passwordRepeat) {
+      console.log('takie same');
+      signUp(data);
+    } else {
+        setError('password', 'repeat');
+        setError('passwordRepeat', 'repeat');
+    }
   };
 
   const onChange = (args) => {
@@ -110,10 +117,10 @@ const Register = props => {
             control={control}
             name="password"
             onChange={onChange}
-            rules={{required: true}}
+            rules={{required: true, repeat: true}}
             defaultValue=""
           />
-          {errors.password && (
+          {errors.password && errors.password.type === 'required' && (
             <Text style={styles.errorInputText}>This field is required</Text>
           )}
           <Controller
@@ -130,12 +137,19 @@ const Register = props => {
             control={control}
             name="passwordRepeat"
             onChange={onChange}
-            rules={{required: true}}
+            rules={{required: true, repeat: true}}
             defaultValue=""
           />
-          {errors.passwordRepeat && (
+          {errors.passwordRepeat && errors.passwordRepeat.type === 'required' && (
             <Text style={styles.errorInputText}>This field is required</Text>
           )}
+
+          {errors.password && errors.password.type === 'repeat' && (
+            <Text style={styles.errorInputText}>
+              Password fields aren't the same
+            </Text>
+          )}
+
           <Block style={{width: '100%', marginTop: 15}}>
             <Controller
               as={
@@ -148,13 +162,13 @@ const Register = props => {
               control={control}
               name="acceptTerms"
               onChange={([selected]) => {
-                return {value: selected};
+                return selected;
               }}
               rules={{required: true}}
               defaultValue={false}
             />
             {errors.acceptTerms && (
-              <Text style={styles.errorInputText}>This field is requiredddd</Text>
+              <Text style={styles.errorInputText}>You have to accept the terms</Text>
             )}
           </Block>
           <Button

@@ -81,7 +81,7 @@ const App = () => {
 
       signUp: async data => {
         const registerResponse = await signUpRequest(data);
-        dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
+      //  dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
       },
       resetErrors: () => {
         dispatch({type: 'AUTH_ERROR', status: false});

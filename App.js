@@ -1,8 +1,9 @@
 //react
 import React, {createContext, useReducer, useMemo} from 'react';
 import {StyleSheet} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, TabActions} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-community/async-storage';
 //packages
 import axios from 'axios';
@@ -16,6 +17,7 @@ import {authReducer} from './reducers';
 import {url} from './env';
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 export const AuthContext = createContext({});
 
 const initialState = {
@@ -121,7 +123,7 @@ const App = () => {
   // }
 
   return (
-    <NavigationContainer style={{backgroundColor: 'white'}}>
+    <NavigationContainer>
       <AuthContext.Provider value={{auth, ...authContext}}>
         <Spinner
           //visible={auth.isLoading}
@@ -132,7 +134,7 @@ const App = () => {
         <Stack.Navigator screenOptions={{headerShown: false}}>
           {auth.userToken == null ? (
             <>
-              <Stack.Screen name="Home" component={Home} />
+              {/* <Stack.Screen name="Home" component={Home} /> */}
               <Stack.Screen name="Login">
                 {props => <Login {...props} />}
               </Stack.Screen>
@@ -141,7 +143,11 @@ const App = () => {
               </Stack.Screen>
             </>
           ) : (
-            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Home">
+              {props =>               <Tab.Navigator>
+              <Tab.Screen name="HomeTab" component={Home} />
+              </Tab.Navigator>}
+              </Stack.Screen>
           )}
         </Stack.Navigator>
       </AuthContext.Provider>

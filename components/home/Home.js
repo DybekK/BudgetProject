@@ -1,5 +1,5 @@
 //react
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState, useRef} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';
 //packages
@@ -7,7 +7,9 @@ import Text from 'galio-framework/src/Text';
 import {Card} from 'galio-framework';
 import {NavBar, Block} from 'galio-framework';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/Feather';
+import IconFeather from 'react-native-vector-icons/Feather';
+import IconEntypo from 'react-native-vector-icons/Entypo';
+import IconMaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SvgCss} from 'react-native-svg';
 import {
   LineChart,
@@ -20,31 +22,35 @@ import {
 //project files
 import {AuthContext} from '../../App';
 import {url} from '../../env';
-import TopGradientHome from '../../assets/images/TopGradientHome';
+import TopGradient from '../../assets/images/TopGradient';
+
 
 const data = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
   datasets: [
     {
-      data: [20, 45, 28, 80, 99, 43],
+      data: [20, 45, 50, 80, 99, 43],
     },
   ],
 };
 
 const chartConfig = {
-  backgroundGradientFrom: '#1E2923',
-  backgroundColor: 'white',
+  backgroundGradientFrom: '#841dbf',
   backgroundGradientFromOpacity: 0,
-  backgroundGradientTo: '#08130D',
-  backgroundGradientToOpacity: 0.5,
-  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-  strokeWidth: 2, // optional, default 3
-  barPercentage: 0.5,
+  backgroundGradientTo: 'white',
+  backgroundGradientToOpacity: 1,
+  color: (opacity = 0) => `rgba(132, 29, 191, ${opacity})`,
+  strokeWidth: 99, // optional, default 3
+  fillShadowGradientOpacity:1,
+  barPercentage: 0.3,
+  barRadius: 5
 };
 
 const Home = () => {
   const {signOut} = useContext(AuthContext);
   const [username, setUsername] = React.useState('');
+  const [width, setWidth] = useState(100);
+  const ref = useRef(null);
 
   const getData = async () => {
     let token = await AsyncStorage.getItem('userToken');
@@ -68,25 +74,25 @@ const Home = () => {
     setUsername(data);
   };
 
-  useEffect(() => {
-    getData();
-  }, []);
+  // useEffect(() => {
+  //   getData();
+  // }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <SvgCss
+    <ScrollView>
+        <SvgCss
         style={[
           {position: 'absolute'},
           {top: 0},
           {width: '100%'},
           {backgroundSize: 'cover'},
         ]}
-        xml={TopGradientHome}
+        xml={TopGradient}
       />
       <NavBar
         transparent
         left={
-          <Icon
+          <IconFeather
             color="white"
             onPress={() => {
               console.log('meh');
@@ -95,25 +101,31 @@ const Home = () => {
             size={22}
           />
         }
+        right={
+          <IconFeather   
+           onPress={signOut} 
+          color="white" name="log-out" size={20} />
+        }
         title="Dashboard"
         titleStyle={styles.titleStyle}
       />
-
       <SafeAreaView style={styles.containerFlex}>
-        <Block style={styles.block}>
+        <Block center ref={ref} style={styles.block}>
           <Block
             style={{
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'center',
             }}>
-            <Text bold h6>
+              <Block>
+              <Text color="#999999" bold h6>
               Week
             </Text>
+              </Block>
             <Text style={{marginHorizontal: 20}} bold h6>
               Month
             </Text>
-            <Text bold h6>
+            <Text color="#999999" bold h6>
               Year
             </Text>
           </Block>
@@ -124,13 +136,28 @@ const Home = () => {
             $4,000
           </Text>
           <BarChart
+          //withInnerLines={false}
+            style={{marginTop:35}}
             data={data}
+            //withHorizontalLabels={false}
             width={300}
-            height={220}
+            height={200}
             yAxisLabel="$"
+            showBarTops={false}
             chartConfig={chartConfig}
-            verticalLabelRotation={30}
+            showBarTops={false}
+            fromZero={true}
+          // verticalLabelRotation={20}
           />
+        </Block>
+        <Block style={{width: '100%'}} space="between" row flex>
+        <Block style={[styles.smallBlock, {marginTop: 10}]}>
+            <Text>Incomes</Text>
+        </Block>
+        <Block style={[styles.smallBlock, {marginTop: 10}]}>
+            <Text>Expences</Text>
+            <IconEntypo name="chevron-with-circle-right" size={30}/>
+        </Block>
         </Block>
       </SafeAreaView>
 
@@ -144,6 +171,17 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
+  checked: {
+    shadowColor: "black",
+shadowOffset: {
+	width: 0,
+	height: 4,
+},
+shadowOpacity: 0.32,
+shadowRadius: 5.46,
+
+elevation: 9,
+  },
   choosenColor: {
     color: '#5d5b59',
   },
@@ -168,6 +206,13 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 10,
   },
+  smallBlock: {
+    backgroundColor: 'white',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    width: '47%',
+    borderRadius: 10,
+  }
 });
 
 export default Home;

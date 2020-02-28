@@ -3,11 +3,13 @@ import React, {createContext, useReducer, useMemo} from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationContainer, TabActions} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-community/async-storage';
 //packages
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
+import IconAntDesign from 'react-native-vector-icons/AntDesign';
+import IconEntypo from 'react-native-vector-icons/Entypo';
 //components
 import Login from './components/login/Login';
 import Home from './components/home/Home';
@@ -132,7 +134,7 @@ const App = () => {
           textStyle={styles.spinnerTextStyle}
         />
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          {auth.userToken == null ? (
+          {true == null ? (
             <>
               {/* <Stack.Screen name="Home" component={Home} /> */}
               <Stack.Screen name="Login">
@@ -144,10 +146,36 @@ const App = () => {
             </>
           ) : (
             <Stack.Screen name="Home">
-              {props =>               <Tab.Navigator>
-              <Tab.Screen name="HomeTab" component={Home} />
-              </Tab.Navigator>}
-              </Stack.Screen>
+              {props => (
+                <Tab.Navigator>
+                  <Tab.Screen
+                    options={{
+                      tabBarLabel: 'Home',
+                      tabBarIcon: ({color, size}) => (
+                        <IconAntDesign
+                          name="linechart"
+                          size={size}
+                          color={color}
+                        />
+                      ),
+                    }}
+                    name="HomeTab"
+                    component={Home}
+                  />
+                  <Tab.Screen
+                    options={{
+                      tabBarLabel: 'Home',
+                      tabBarIcon: ({color, size}) => (
+                        <IconEntypo name="wallet" size={size} color={color} />
+                      ),
+                    }}
+                    name="TestOneTab"
+                    component={Login}
+                  />
+                  <Tab.Screen name="TestTwoTab" component={Home} />
+                </Tab.Navigator>
+              )}
+            </Stack.Screen>
           )}
         </Stack.Navigator>
       </AuthContext.Provider>

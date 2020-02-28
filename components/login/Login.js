@@ -63,7 +63,7 @@ const Login = props => {
             Login to your account
           </Text>
         </View>
-        <Block style={styles.block}>
+        <Block elevation={0.7} shadow style={styles.block}>
           <Controller
             as={
               <Input

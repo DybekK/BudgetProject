@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 //react
 import React, {useContext, useEffect, useState, useRef} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -44,7 +45,7 @@ const dataChart = {
   // labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
   datasets: [
     {
-      data: [20, 45, 50, 80, 99, 43, 20, 45, 50, 80, 99, 43],
+      data: [-20, 45, 50, -50, 99, 43, 20, -45, 50, 80, 99, 43],
     },
   ],
 };
@@ -69,6 +70,7 @@ const Home = props => {
   const [incomesAmount, setIncomesAmount] = useState(0);
   const [expensesAmount, setExpensesAmount] = useState(0);
   const [summaryAmount, setSummaryAmount] = useState(0);
+  const [btnSelected, setBtnSelected] = useState(1);
   const ref = useRef(null);
 
   const navigateToRegister = () => {
@@ -165,17 +167,18 @@ const Home = props => {
       <SvgCss
         style={[
           {position: 'absolute'},
-          {top: 60},
+          {top: 0},
           {width: '100%'},
           {backgroundSize: 'cover'},
         ]}
         xml={TopGradientHome}
       />
       <NavBar
+        transparent
         style={styles.navbar}
         left={
           <IconFeather
-            color="black"
+            color="white"
             onPress={() => {
               console.log('meh');
             }}
@@ -186,7 +189,7 @@ const Home = props => {
         right={
           <IconFeather
             onPress={signOut}
-            color="black"
+            color="white"
             name="log-out"
             size={20}
           />
@@ -203,20 +206,30 @@ const Home = props => {
           ref={ref}
           style={styles.block}>
           <Block
+          space="between"
             style={{
-              width: '100%',
+              width: '60%',
               backgroundColor: 'white',
             }}
             middle
             flex
             row>
-            <Text color="#999999" bold h6>
+            <Text
+              h6
+              style={btnSelected == 1 ? styles.btnSelected : styles.notSelected}
+              onPress={() => setBtnSelected(1)}>
               Week
             </Text>
-            <Text style={{marginHorizontal: 30}} bold h6>
+            <Text
+              h6
+              style={btnSelected == 2 ? styles.btnSelected : styles.notSelected}
+              onPress={() => setBtnSelected(2)}>
               Month
             </Text>
-            <Text color="#999999" bold h6>
+            <Text
+              style={btnSelected == 3 ? styles.btnSelected : styles.notSelected}
+              onPress={() => setBtnSelected(3)}
+              h6>
               Year
             </Text>
           </Block>
@@ -352,11 +365,18 @@ const Home = props => {
 
 const styles = StyleSheet.create({
   navbar: {
-    marginBottom: 10,
+    //marginBottom: 10,
     //position: 'fixed',
   },
   bottomText: {
     fontSize: 15,
+  },
+  btnSelected: {
+    fontWeight: 'bold',
+    // color: 'black',
+  },
+  notSelected: {
+    color: '#999999',
   },
   checked: {
     shadowColor: 'black',
@@ -384,6 +404,7 @@ const styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: 16,
+    color: 'white',
   },
   block: {
     backgroundColor: 'white',

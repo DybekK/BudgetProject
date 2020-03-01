@@ -21,12 +21,11 @@ import {
   StackedBarChart,
 } from 'react-native-chart-kit';
 //project files
-import {AuthContext} from '../../App';
+import {AuthContext, HttpContext} from '../../App';
 import {url} from '../../env';
 import TopGradient from '../../assets/images/TopGradient';
 import TopGradientHome from '../../assets/images/TopGradientHome';
-
-const data = {
+const dataChart = {
   labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
   // labels: [
   //   'Jan',
@@ -62,37 +61,104 @@ const chartConfig = {
   barRadius: 5,
 };
 
-const Home = () => {
+const Home = props => {
+  const {navigation} = props;
   const {signOut} = useContext(AuthContext);
-  const [username, setUsername] = React.useState('');
-  const [width, setWidth] = useState(100);
+  const {httpDispatch, http} = useContext(HttpContext);
+  const {data} = http;
+  const [incomesAmount, setIncomesAmount] = useState(0);
+  const [expensesAmount, setExpensesAmount] = useState(0);
+  const [summaryAmount, setSummaryAmount] = useState(0);
   const ref = useRef(null);
+
+  const navigateToRegister = () => {
+    console.log('navigation');
+    navigation.navigate('StatsTabMeh');
+  };
+
+  const countMoney = () => {
+    setSummaryAmount(0);
+    setIncomesAmount(0);
+    setExpensesAmount(0);
+    if (http.data) {
+      http.data.map(transaction => {
+        if (transaction.type === 'INCOME') {
+          setIncomesAmount(prev => prev + parseFloat(transaction.amount));
+        } else if (transaction.type === 'EXPENSE') {
+          setExpensesAmount(prev => prev + parseFloat(transaction.amount));
+        }
+      });
+    }
+  };
+
+  const ChangeSummary = () => {
+    if (summaryAmount > 0) {
+      return (
+        <>
+          <Text style={{marginRight: 15}} color="#07ed07" center bold h3>
+            ${summaryAmount}
+          </Text>
+          <IconFeather name="trending-up" size={35} color="#07ed07" />
+        </>
+      );
+    }
+    if (summaryAmount == 0) {
+      return (
+        <>
+          <Text style={{marginRight: 15}} color="#f2ea46" center bold h3>
+            ${summaryAmount}
+          </Text>
+          <IconFeather name="minus" size={35} color="#f2ea46" />
+        </>
+      );
+    }
+    if (summaryAmount < 0) {
+      return (
+        <>
+          <Text style={{marginRight: 15}} color="red" center bold h3>
+            ${summaryAmount}
+          </Text>
+          <IconFeather name="trending-down" size={35} color="red" />
+        </>
+      );
+    }
+  };
 
   const getData = async () => {
     let token = await AsyncStorage.getItem('userToken');
 
-    // try {
-    //     const response = await axios.post('http://192.168.1.187:8000/api/jwt/test', {
-    //         head
-    //     });
-    //     return await response.data;
-    // } catch (e) {
-    //     console.log(e);
-    // }
+    const config = {
+      headers: {Authorization: `Bearer ${token}`},
+    };
 
-    const response = await fetch(`${url}/api/jwt/test`, {
-      method: 'GET',
-      headers: {
-        Authorization: 'Bearer ' + token,
-      },
-    });
-    const data = await response.json();
-    setUsername(data);
+    try {
+      const response = await axios.get(
+        `${url}/api/jwt/transactions?time=week`,
+        config,
+      );
+      console.log(response.data);
+      await httpDispatch({type: 'SET_DATA', data: response.data});
+    } catch (e) {
+      console.log(e);
+    }
+
+    //setUsername(data);
   };
 
-  // useEffect(() => {
-  //   getData();
-  // }, []);
+  //console.log(http.data);
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  useEffect(() => {
+    countMoney();
+    const sum = (incomesAmount - expensesAmount).toFixed(2);
+    setSummaryAmount(sum);
+  }, [http, incomesAmount, expensesAmount]);
+
+  console.log('INCOMES ' + incomesAmount);
+  console.log('EXPENSES ' + expensesAmount);
 
   return (
     <ScrollView>
@@ -141,17 +207,14 @@ const Home = () => {
               width: '100%',
               backgroundColor: 'white',
             }}
+            middle
             flex
-            space="around"
             row>
             <Text color="#999999" bold h6>
               Week
             </Text>
-            <Text bold h6>
+            <Text style={{marginHorizontal: 30}} bold h6>
               Month
-            </Text>
-            <Text color="#999999" bold h6>
-              Half year
             </Text>
             <Text color="#999999" bold h6>
               Year
@@ -161,15 +224,12 @@ const Home = () => {
             Expense summary
           </Text>
           <Block flex center row>
-            <Text style={{marginRight: 15}} color="#07ed07" center bold h3>
-              $1.884
-            </Text>
-            <IconFeather name="trending-up" size={35} color="#07ed07" />
+            <ChangeSummary summaryAmount={summaryAmount} />
           </Block>
           <BarChart
             //withInnerLines={false}
             style={{marginTop: 35}}
-            data={data}
+            data={dataChart}
             //withHorizontalLabels={false}
             width={300}
             height={200}
@@ -193,7 +253,7 @@ const Home = () => {
                 <Text style={styles.bottomText}>Incomes</Text>
                 <Block row center middle>
                   <Text bold h5>
-                    $3,134
+                    ${incomesAmount}
                   </Text>
                   <IconFeather
                     style={{marginLeft: 9}}
@@ -206,6 +266,7 @@ const Home = () => {
             </Block>
             <Button
               onlyIcon
+              onPress={navigateToRegister}
               shadowless
               icon="popup"
               iconFamily="Entypo"
@@ -227,10 +288,10 @@ const Home = () => {
             style={[styles.smallBlock, {marginVertical: 10}]}>
             <Block row middle>
               <Block>
-                <Text style={styles.bottomText}>Expences</Text>
+                <Text style={styles.bottomText}>Expenses</Text>
                 <Block row center middle>
                   <Text bold h5>
-                    $1,250
+                    ${expensesAmount}
                   </Text>
                   <IconFeather
                     style={{marginLeft: 9}}

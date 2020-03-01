@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
+import Text from 'galio-framework/src/Text';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 //components
 import Login from './components/login/Login';
@@ -16,21 +17,30 @@ import Home from './components/home/Home';
 import Register from './components/register/Register';
 //project files
 import {authReducer} from './reducers';
+import {httpReducer} from './reducers';
 import {url} from './env';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-export const AuthContext = createContext({});
+export const AuthContext = createContext();
+export const HttpContext = createContext();
 
-const initialState = {
+const initialStateAuth = {
   isLoading: false,
   isSignout: false,
   userToken: null,
   authError: null,
 };
 
+const initialStateHttp = {
+  isLoading: false,
+  data: null,
+  httpError: null,
+};
+
 const App = () => {
-  const [auth, dispatch] = useReducer(authReducer, initialState);
+  const [auth, authDispatch] = useReducer(authReducer, initialStateAuth);
+  const [http, httpDispatch] = useReducer(httpReducer, initialStateHttp);
 
   const signInRequest = async data => {
     console.log(data);
@@ -43,7 +53,7 @@ const App = () => {
         // console.log(err.response.data);
         //console.log(err.response.status);
         // console.log(err.response.headers);
-        dispatch({type: 'AUTH_ERROR', status: err.response.status});
+        authDispatch({type: 'AUTH_ERROR', status: err.response.status});
       } else if (err.request) {
         // The request was made but no response was received
         console.log(err.request);
@@ -65,7 +75,7 @@ const App = () => {
         //console.log('masnoooo niii' + err.response.status);
         // console.log(err.response.headers);
         console.log(err.response.status);
-        dispatch({type: 'AUTH_ERROR', status: err.response.status});
+        authDispatch({type: 'AUTH_ERROR', status: err.response.status});
       } else if (err.request) {
         // The request was made but no response was received
         console.log(err.request);
@@ -79,27 +89,27 @@ const App = () => {
   const authContext = useMemo(
     () => ({
       signIn: async data => {
-        dispatch({type: 'SET_LOADING', loading: true});
+        authDispatch({type: 'SET_LOADING', loading: true});
         const token = await signInRequest(data);
         if (token !== undefined) {
           await AsyncStorage.setItem('userToken', token);
           console.log(await AsyncStorage.getItem('userToken'));
-          dispatch({type: 'SIGN_IN', token: token});
+          authDispatch({type: 'SIGN_IN', token: token});
         }
-        dispatch({type: 'SET_LOADING', loading: false});
+        authDispatch({type: 'SET_LOADING', loading: false});
       },
       signInAfterRegister: async data => {
         const token = await signInRequest(data);
         if (token !== undefined) {
           await AsyncStorage.setItem('userToken', token);
           console.log(await AsyncStorage.getItem('userToken'));
-          dispatch({type: 'SIGN_IN', token: token});
+          authDispatch({type: 'SIGN_IN', token: token});
         }
       },
-      signOut: () => dispatch({type: 'SIGN_OUT'}),
+      signOut: () => authDispatch({type: 'SIGN_OUT'}),
 
       signUp: async data => {
-        dispatch({type: 'SET_LOADING', loading: true});
+        authDispatch({type: 'SET_LOADING', loading: true});
         const registerResponse = await signUpRequest(data);
         console.log(registerResponse);
         if (registerResponse === 200) {
@@ -110,19 +120,32 @@ const App = () => {
           };
           authContext.signInAfterRegister(meh);
         }
-        dispatch({type: 'SET_LOADING', loading: false});
+        authDispatch({type: 'SET_LOADING', loading: false});
       },
       resetErrors: () => {
-        dispatch({type: 'AUTH_ERROR', status: false});
+        authDispatch({type: 'AUTH_ERROR', status: false});
       },
     }),
     [],
   );
 
+  // const httpContext = useMemo(
+  //   () => ({
+  //     getData: () => {
+
+  //     },
+  //   }),
+  //   [],
+  // );
+
   // if (auth.isLoading) {
   //     // We haven't finished checking for the token yet
   //     return <Text>Ladowanie</Text>;
   // }
+
+  const Meh = () => {
+    return <Text>meg</Text>;
+  };
 
   return (
     <NavigationContainer>
@@ -134,7 +157,7 @@ const App = () => {
           textStyle={styles.spinnerTextStyle}
         />
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          {true == null ? (
+          {auth.userToken == null ? (
             <>
               {/* <Stack.Screen name="Home" component={Home} /> */}
               <Stack.Screen name="Login">
@@ -145,35 +168,33 @@ const App = () => {
               </Stack.Screen>
             </>
           ) : (
-            <Stack.Screen name="Home">
+            <Stack.Screen name="Logged">
               {props => (
-                <Tab.Navigator>
-                  <Tab.Screen
-                    options={{
-                      tabBarLabel: 'Home',
-                      tabBarIcon: ({color, size}) => (
-                        <IconAntDesign
-                          name="linechart"
-                          size={size}
-                          color={color}
-                        />
-                      ),
-                    }}
-                    name="HomeTab"
-                    component={Home}
-                  />
-                  <Tab.Screen
-                    options={{
-                      tabBarLabel: 'Home',
-                      tabBarIcon: ({color, size}) => (
-                        <IconEntypo name="wallet" size={size} color={color} />
-                      ),
-                    }}
-                    name="TestOneTab"
-                    component={Login}
-                  />
-                  <Tab.Screen name="TestTwoTab" component={Home} />
-                </Tab.Navigator>
+                <HttpContext.Provider value={{http, httpDispatch}}>
+                  <Tab.Navigator>
+                    <Tab.Screen
+                      options={{
+                        tabBarLabel: 'Stats',
+                        tabBarIcon: ({color, size}) => (
+                          <IconAntDesign
+                            name="linechart"
+                            size={size}
+                            color={color}
+                          />
+                        ),
+                      }}
+                      name="StatsTab">
+                      {() => (
+                        <Stack.Navigator screenOptions={{headerShown: false}}>
+                          <Stack.Screen name="StatsTabIncomes">
+                            {() => <Home {...props} />}
+                          </Stack.Screen>
+                          <Stack.Screen name="StatsTabMeh" component={Meh} />
+                        </Stack.Navigator>
+                      )}
+                    </Tab.Screen>
+                  </Tab.Navigator>
+                </HttpContext.Provider>
               )}
             </Stack.Screen>
           )}

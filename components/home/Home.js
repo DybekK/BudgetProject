@@ -98,7 +98,7 @@ const Home = props => {
       return (
         <>
           <Text style={{marginRight: 15}} color="#07ed07" center bold h3>
-            ${summaryAmount}
+            {summaryAmount}$
           </Text>
           <IconFeather name="trending-up" size={35} color="#07ed07" />
         </>
@@ -108,7 +108,7 @@ const Home = props => {
       return (
         <>
           <Text style={{marginRight: 15}} color="#f2ea46" center bold h3>
-            ${summaryAmount}
+            {summaryAmount}$
           </Text>
           <IconFeather name="minus" size={35} color="#f2ea46" />
         </>
@@ -118,7 +118,7 @@ const Home = props => {
       return (
         <>
           <Text style={{marginRight: 15}} color="red" center bold h3>
-            ${summaryAmount}
+            {summaryAmount}$
           </Text>
           <IconFeather name="trending-down" size={35} color="red" />
         </>
@@ -126,16 +126,16 @@ const Home = props => {
     }
   };
 
-  const getData = async () => {
+  const getData = async (time, btn) => {
+    setBtnSelected(btn);
     let token = await AsyncStorage.getItem('userToken');
 
     const config = {
       headers: {Authorization: `Bearer ${token}`},
     };
-
     try {
       const response = await axios.get(
-        `${url}/api/jwt/transactions?time=week`,
+        `${url}/api/jwt/transactions?time=${time}`,
         config,
       );
       console.log(response.data);
@@ -143,14 +143,12 @@ const Home = props => {
     } catch (e) {
       console.log(e);
     }
-
-    //setUsername(data);
   };
 
   //console.log(http.data);
 
   useEffect(() => {
-    getData();
+    getData('week', 1);
   }, []);
 
   useEffect(() => {
@@ -171,7 +169,7 @@ const Home = props => {
           {width: '100%'},
           {backgroundSize: 'cover'},
         ]}
-        xml={TopGradientHome}
+        xml={TopGradient}
       />
       <NavBar
         transparent
@@ -206,7 +204,7 @@ const Home = props => {
           ref={ref}
           style={styles.block}>
           <Block
-          space="between"
+            space="between"
             style={{
               width: '60%',
               backgroundColor: 'white',
@@ -217,18 +215,18 @@ const Home = props => {
             <Text
               h6
               style={btnSelected == 1 ? styles.btnSelected : styles.notSelected}
-              onPress={() => setBtnSelected(1)}>
+              onPress={() => getData('week', 1)}>
               Week
             </Text>
             <Text
               h6
               style={btnSelected == 2 ? styles.btnSelected : styles.notSelected}
-              onPress={() => setBtnSelected(2)}>
+              onPress={() => getData('month', 2)}>
               Month
             </Text>
             <Text
               style={btnSelected == 3 ? styles.btnSelected : styles.notSelected}
-              onPress={() => setBtnSelected(3)}
+              onPress={() => getData('year', 3)}
               h6>
               Year
             </Text>
@@ -266,7 +264,7 @@ const Home = props => {
                 <Text style={styles.bottomText}>Incomes</Text>
                 <Block row center middle>
                   <Text bold h5>
-                    ${incomesAmount}
+                    {incomesAmount}$
                   </Text>
                   <IconFeather
                     style={{marginLeft: 9}}
@@ -304,7 +302,7 @@ const Home = props => {
                 <Text style={styles.bottomText}>Expenses</Text>
                 <Block row center middle>
                   <Text bold h5>
-                    ${expensesAmount}
+                    {expensesAmount}$
                   </Text>
                   <IconFeather
                     style={{marginLeft: 9}}

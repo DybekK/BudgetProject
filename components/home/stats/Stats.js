@@ -2,7 +2,7 @@
 //react
 import React, {useContext, useEffect, useState, useRef} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
-import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';
+import {SafeAreaView, StyleSheet, ScrollView, Dimensions} from 'react-native';
 //packages
 import Text from 'galio-framework/src/Text';
 import {Card} from 'galio-framework';
@@ -56,13 +56,13 @@ const chartConfig = {
   backgroundGradientTo: 'white',
   backgroundGradientToOpacity: 1,
   color: (opacity = 0) => `rgba(132, 29, 191, ${opacity})`,
-  strokeWidth: 99, // optional, default 3
   fillShadowGradientOpacity: 1,
   barPercentage: 0.3,
   barRadius: 5,
 };
 
 const Stats = props => {
+  const {height, width} = Dimensions.get('window');
   const {navigation} = props;
   const {signOut} = useContext(AuthContext);
   const {httpDispatch, http} = useContext(HttpContext);
@@ -151,8 +151,6 @@ const Stats = props => {
     }
   };
 
-  //console.log(http.data);
-
   useEffect(() => {
     getData('week', 1);
   }, []);
@@ -207,7 +205,6 @@ const Stats = props => {
           elevation={0.7}
           shadow
           center
-          ref={ref}
           style={styles.block}>
           <Block
             space="between"
@@ -248,7 +245,7 @@ const Stats = props => {
             style={{marginTop: 35}}
             data={dataChart}
             //withHorizontalLabels={false}
-            width={300}
+            width={width - 50}
             height={200}
             yAxisLabel="$"
             showBarTops={false}

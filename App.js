@@ -144,9 +144,6 @@ const App = () => {
   //     return <Text>Ladowanie</Text>;
   // }
 
-  const Meh = () => {
-    return <Text>meg</Text>;
-  };
 
   return (
     <NavigationContainer>

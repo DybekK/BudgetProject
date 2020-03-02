@@ -22,10 +22,10 @@ import {
   StackedBarChart,
 } from 'react-native-chart-kit';
 //project files
-import {AuthContext, HttpContext} from '../../App';
-import {url} from '../../env';
-import TopGradient from '../../assets/images/TopGradient';
-import TopGradientHome from '../../assets/images/TopGradientHome';
+import {AuthContext, HttpContext} from '../../../App';
+import {url} from '../../../env';
+import TopGradient from '../../../assets/images/TopGradient';
+import TopGradientHome from '../../../assets/images/TopGradientHome';
 const dataChart = {
   labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
   // labels: [
@@ -62,20 +62,26 @@ const chartConfig = {
   barRadius: 5,
 };
 
-const Home = props => {
+const Stats = props => {
   const {navigation} = props;
   const {signOut} = useContext(AuthContext);
   const {httpDispatch, http} = useContext(HttpContext);
-  const {data} = http;
   const [incomesAmount, setIncomesAmount] = useState(0);
   const [expensesAmount, setExpensesAmount] = useState(0);
   const [summaryAmount, setSummaryAmount] = useState(0);
   const [btnSelected, setBtnSelected] = useState(1);
   const ref = useRef(null);
 
-  const navigateToRegister = () => {
-    console.log('navigation');
-    navigation.navigate('StatsTabMeh');
+  const navigateToShowMoreStack = type => {
+    const data = [];
+    http.data.map(transaction => {
+      if (transaction.type === type) {
+        data.push(transaction);
+      }
+    });
+    navigation.navigate('StatsMoreStack', {
+      data,
+    });
   };
 
   const countMoney = () => {
@@ -251,7 +257,7 @@ const Home = props => {
             // verticalLabelRotation={20}
           />
         </Block>
-        <Block style={{width: '100%'}} flex>
+        <Block dd style={{width: '100%'}} flex>
           <Block
             elevation={0.7}
             shadow
@@ -277,7 +283,7 @@ const Home = props => {
             </Block>
             <Button
               onlyIcon
-              onPress={navigateToRegister}
+              onPress={() => navigateToShowMoreStack('INCOME')}
               shadowless
               icon="popup"
               iconFamily="Entypo"
@@ -315,6 +321,7 @@ const Home = props => {
             </Block>
             <Button
               onlyIcon
+              onPress={() => navigateToShowMoreStack('EXPENSE')}
               shadowless
               icon="popup"
               iconFamily="Entypo"
@@ -420,4 +427,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default Stats;

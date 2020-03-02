@@ -13,8 +13,9 @@ import Text from 'galio-framework/src/Text';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 //components
 import Login from './components/login/Login';
-import Home from './components/home/Home';
 import Register from './components/register/Register';
+import Stats from './components/home/stats/Stats';
+import StatsMore from './components/home/stats/statsMore/StatsMore';
 //project files
 import {authReducer} from './reducers';
 import {httpReducer} from './reducers';
@@ -168,7 +169,7 @@ const App = () => {
               </Stack.Screen>
             </>
           ) : (
-            <Stack.Screen name="Logged">
+            <Stack.Screen name="Home">
               {props => (
                 <HttpContext.Provider value={{http, httpDispatch}}>
                   <Tab.Navigator>
@@ -186,10 +187,13 @@ const App = () => {
                       name="StatsTab">
                       {() => (
                         <Stack.Navigator screenOptions={{headerShown: false}}>
-                          <Stack.Screen name="StatsTabIncomes">
-                            {() => <Home {...props} />}
+                          <Stack.Screen name="StatsStack">
+                            {() => <Stats {...props} />}
                           </Stack.Screen>
-                          <Stack.Screen name="StatsTabMeh" component={Meh} />
+                          <Stack.Screen
+                            name="StatsMoreStack"
+                            component={StatsMore}
+                          />
                         </Stack.Navigator>
                       )}
                     </Tab.Screen>

@@ -14,11 +14,13 @@ import Text from 'galio-framework/src/Text';
 import moment from 'moment';
 import {Card} from 'galio-framework';
 import {NavBar, Block, Button} from 'galio-framework';
+import Svg, {Circle} from 'react-native-svg';
 import axios from 'axios';
 import IconFeather from 'react-native-vector-icons/Feather';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconMaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
+
 import {SvgCss} from 'react-native-svg';
 import {
   LineChart,
@@ -55,31 +57,10 @@ const chartConfig = {
 };
 
 const StatsMore = props => {
-  const {height, width} = Dimensions.get('window');
-  //   const dataChart = {
-  //     labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-  //     dataset: [
-  //       {
-  //         data: [20, 45, 28, 80, 99, 43],
-  //       },
-  //     ],
-  //   };
+  console.log('sprawdzam kolor: ');
+  console.log(props[0]);
 
-  //   const chartConfig = {
-  //     backgroundColor: '#e26a00',
-  //     backgroundGradientFrom: '#fb8c00',
-  //     backgroundGradientTo: '#ffa726',
-  //     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-  //     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-  //     style: {
-  //       borderRadius: 16,
-  //     },
-  //     propsForDots: {
-  //       r: '6',
-  //       strokeWidth: '2',
-  //       stroke: '#ffa726',
-  //     },
-  //   };
+  const {height, width} = Dimensions.get('window');
 
   const {httpDispatch, http} = useContext(HttpContext);
   const {data} = props.route.params;
@@ -127,9 +108,19 @@ const StatsMore = props => {
               <Block middle row space="between" style={styles.smallBlock}>
                 <Block style={{width: '100%'}} column>
                   <Block flex row space="between" middle>
-                    <Text bold style={styles.bottomText}>
+                    <Block flex row center>
+                      <Svg height="10" width="10">
+                        <Circle
+                          r="5"
+                          cx="5"
+                          cy="5"
+                          fill={transaction.iconColor}
+                        />
+                      </Svg>
+                      <Text bold style={styles.bottomText}>
                       {transaction.transactionname}
                     </Text>
+                    </Block>
                     <Text bold>{transaction.amount}$</Text>
                   </Block>
                   <Block flex row space="between" middle>
@@ -193,7 +184,7 @@ const styles = StyleSheet.create({
   block: {
     backgroundColor: 'white',
     paddingVertical: 15,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   smallBlock: {
     backgroundColor: 'white',

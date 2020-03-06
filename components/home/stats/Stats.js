@@ -28,21 +28,6 @@ import TopGradient from '../../../assets/images/TopGradient';
 import TopGradientHome from '../../../assets/images/TopGradientHome';
 const dataChart = {
   labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
-  // labels: [
-  //   'Jan',
-  //   'Feb',
-  //   'Mar',
-  //   'Apr',
-  //   'May',
-  //   'Jun',
-  //   'Jan',
-  //   'Feb',
-  //   'Mar',
-  //   'Apr',
-  //   'May',
-  //   'Jun',
-  // ],
-  // labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
   datasets: [
     {
       data: [-20, 45, 50, -50, 99, 43, 20, -45, 50, 80, 99, 43],
@@ -305,7 +290,7 @@ const Stats = props => {
                 <Text style={styles.bottomText}>Expenses</Text>
                 <Block row center middle>
                   <Text bold h5>
-                    {expensesAmount}$
+                    {expensesAmount.toFixed(2)}$
                   </Text>
                   <IconFeather
                     style={{marginLeft: 9}}

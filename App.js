@@ -144,7 +144,6 @@ const App = () => {
   //     return <Text>Ladowanie</Text>;
   // }
 
-
   return (
     <NavigationContainer>
       <AuthContext.Provider value={{auth, ...authContext}}>

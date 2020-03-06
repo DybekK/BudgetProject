@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 //react
 import React, {useEffect, useContext} from 'react';
 import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';

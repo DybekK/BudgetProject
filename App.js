@@ -16,6 +16,7 @@ import Login from './components/login/Login';
 import Register from './components/register/Register';
 import Stats from './components/home/stats/Stats';
 import StatsMore from './components/home/stats/statsMore/StatsMore';
+import AddTransaction from './components/home/addTransaction/AddTransaction';
 //project files
 import {authReducer} from './reducers';
 import {httpReducer} from './reducers';
@@ -185,6 +186,9 @@ const App = () => {
                         <Stack.Navigator screenOptions={{headerShown: false}}>
                           <Stack.Screen name="StatsStack">
                             {() => <Stats {...props} />}
+                          </Stack.Screen>
+                          <Stack.Screen name="StatsAddTransaction">
+                            {() => <AddTransaction {...props} />}
                           </Stack.Screen>
                           <Stack.Screen
                             name="StatsMoreStack"

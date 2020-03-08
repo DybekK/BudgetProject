@@ -51,10 +51,6 @@ const StatsMore = props => {
     return moment(date).format('D MMMM HH:mm');
   };
 
-  const navigateBack = () => {
-    navigation.goBack();
-  };
-
   const Type = () => {
     if (type === 'INCOME') {
       return 'Incomes';
@@ -65,7 +61,7 @@ const StatsMore = props => {
   };
 
   useEffect(() => {
-    const parent = props.navigation.dangerouslyGetParent();
+    const parent = navigation.dangerouslyGetParent();
     parent.setOptions({
       tabBarVisible: false,
     });
@@ -82,7 +78,7 @@ const StatsMore = props => {
         left={
           <IconIonicons
             color="black"
-            onPress={navigateBack}
+            onPress={() => navigation.goBack()}
             name="ios-arrow-round-back"
             size={35}
           />
@@ -101,16 +97,15 @@ const StatsMore = props => {
                 {summary}$
               </Text>
             </Block>
-
             <Button
               onlyIcon
               icon="add"
+              onPress={() => navigation.navigate('StatsAddTransaction')}
               iconFamily="MaterialIcons"
               iconSize={28}
               iconColor="#fff"
-              style={{width: 32, height: 32}}>
-              warning
-            </Button>
+              style={{width: 32, height: 32}}
+            />
           </Block>
 
           <LineChart

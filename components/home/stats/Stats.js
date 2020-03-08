@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {SafeAreaView, StyleSheet, ScrollView, Dimensions} from 'react-native';
 //packages
 import Text from 'galio-framework/src/Text';
-import {Card} from 'galio-framework';
 import {NavBar, Block, Button} from 'galio-framework';
 import axios from 'axios';
 import IconFeather from 'react-native-vector-icons/Feather';
@@ -13,14 +12,7 @@ import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconMaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import {SvgCss} from 'react-native-svg';
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart,
-} from 'react-native-chart-kit';
+import {BarChart} from 'react-native-chart-kit';
 //project files
 import {AuthContext, HttpContext} from '../../../App';
 import {url} from '../../../env';
@@ -47,7 +39,7 @@ const chartConfig = {
 };
 
 const Stats = props => {
-  const {height, width} = Dimensions.get('window');
+  const {width} = Dimensions.get('window');
   const {navigation} = props;
   const {signOut} = useContext(AuthContext);
   const {httpDispatch, http} = useContext(HttpContext);
@@ -74,8 +66,6 @@ const Stats = props => {
       data,
       summary,
       type,
-      btnSelected,
-      getData: getData(),
     });
   };
 

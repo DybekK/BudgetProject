@@ -7,8 +7,11 @@ import RadioForm, {
   RadioButtonLabel,
 } from 'react-native-simple-radio-button';
 import {Controller, useForm} from 'react-hook-form';
+import AsyncStorage from '@react-native-community/async-storage';
 import {NavBar, Block, Button} from 'galio-framework';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
+import {url} from '../../../env';
 let radio_props = [{label: 'Income', value: 0}, {label: 'Expense', value: 1}];
 
 const AddTransaction = props => {
@@ -16,16 +19,40 @@ const AddTransaction = props => {
   const [checkedValue, setCheckedValue] = useState(0);
   const {handleSubmit, errors, control, setError, clearError} = useForm();
 
+  const postTransaction = async data => {
+    let token = await AsyncStorage.getItem('userToken');
+    console.log(data);
+    const config = {
+      headers: {Authorization: `Bearer ${token}`},
+    };
+
+    try {
+      const response = await axios.post(
+        `${url}/api/jwt/transaction`,
+        data,
+        config,
+      );
+      console.log(response.data);
+      //await httpDispatch({type: 'SET_DATA', data: response.data});
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const onSubmit = async data => {
     switch (checkedValue) {
       case 0:
         data.type = 'INCOME';
         break;
       case 1:
-        data.type = 'EXPENSES';
+        data.type = 'EXPENSE';
         break;
     }
+
+    data.kind = 'ANY';
+
     console.log(data);
+    postTransaction(data);
   };
 
   const onChange = args => {

@@ -94,7 +94,7 @@ const StatsMore = props => {
                 Total <Type />
               </Text>
               <Text bold h3>
-                {summary}$
+                {summary.toFixed(2)}$
               </Text>
             </Block>
             <Button

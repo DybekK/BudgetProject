@@ -59,13 +59,23 @@ const Stats = props => {
 
   const navigateToShowMoreStack = type => {
     const data = [];
+    let summary;
     http.data.map(transaction => {
       if (transaction.type === type) {
         data.push(transaction);
       }
     });
+    if (type === 'INCOME') {
+      summary = incomesAmount;
+    } else if (type === 'EXPENSE') {
+      summary = expensesAmount;
+    }
     navigation.navigate('StatsMoreStack', {
       data,
+      summary,
+      type,
+      btnSelected,
+      getData: getData(),
     });
   };
 

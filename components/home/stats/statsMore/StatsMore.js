@@ -1,35 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 //react
-import React, {useContext, useEffect, useState, useRef} from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
-import {
-  SafeAreaView,
-  StyleSheet,
-  View,
-  ScrollView,
-  Dimensions,
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {SafeAreaView, StyleSheet, ScrollView, Dimensions} from 'react-native';
 //packages
 import Text from 'galio-framework/src/Text';
 import moment from 'moment';
-import {Card} from 'galio-framework';
-import {NavBar, Block, Button} from 'galio-framework';
+import {Block, Button, NavBar} from 'galio-framework';
 import Svg, {Circle} from 'react-native-svg';
 import axios from 'axios';
 import IconFeather from 'react-native-vector-icons/Feather';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconMaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
-
-import {SvgCss} from 'react-native-svg';
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart,
-} from 'react-native-chart-kit';
+import IconIonicons from 'react-native-vector-icons/Ionicons';
+import {LineChart} from 'react-native-chart-kit';
 //project files
 import {HttpContext} from '../../../../App';
 
@@ -57,24 +41,78 @@ const chartConfig = {
 };
 
 const StatsMore = props => {
-  console.log('sprawdzam kolor: ');
-  console.log(props[0]);
-
   const {height, width} = Dimensions.get('window');
-
-  const {httpDispatch, http} = useContext(HttpContext);
-  const {data} = props.route.params;
-  console.log(data);
+  //const {httpDispatch, http} = useContext(HttpContext);
+  const {data, summary, type} = props.route.params;
+  const {navigation} = props;
   const ConvertDate = props => {
     const {transaction} = props;
     const date = new Date(transaction.updated_at.timestamp * 1000);
     return moment(date).format('D MMMM HH:mm');
   };
 
+  const navigateBack = () => {
+    navigation.goBack();
+  };
+
+  const Type = () => {
+    if (type === 'INCOME') {
+      return 'Incomes';
+    }
+    if (type === 'EXPENSE') {
+      return 'Expenses';
+    }
+  };
+
+  useEffect(() => {
+    const parent = props.navigation.dangerouslyGetParent();
+    parent.setOptions({
+      tabBarVisible: false,
+    });
+    return () =>
+      parent.setOptions({
+        tabBarVisible: true,
+      });
+  }, []);
+
   return (
     <ScrollView>
+      <NavBar
+        style={styles.navbar}
+        left={
+          <IconIonicons
+            color="black"
+            onPress={navigateBack}
+            name="ios-arrow-round-back"
+            size={35}
+          />
+        }
+        title={Type()}
+        titleStyle={styles.titleStyle}
+      />
       <SafeAreaView style={styles.containerFlex}>
         <Block shadowColor="#e0e0e0" elevation={0.7} style={styles.chartBlock}>
+          <Block style={{width: '80%'}} flex row center space="between">
+            <Block>
+              <Text style={styles.summary}>
+                Total <Type />
+              </Text>
+              <Text bold h3>
+                {summary}$
+              </Text>
+            </Block>
+
+            <Button
+              onlyIcon
+              icon="add"
+              iconFamily="MaterialIcons"
+              iconSize={28}
+              iconColor="#fff"
+              style={{width: 32, height: 32}}>
+              warning
+            </Button>
+          </Block>
+
           <LineChart
             //withInnerLines={false}
             withOuterLines={false}
@@ -109,25 +147,23 @@ const StatsMore = props => {
                 <Block style={{width: '100%'}} column>
                   <Block flex row space="between" middle>
                     <Block flex row center>
-                      <Svg height="10" width="10">
+                      <Svg height="8" width="8">
                         <Circle
-                          r="5"
-                          cx="5"
-                          cy="5"
+                          r="4"
+                          cx="4"
+                          cy="4"
                           fill={transaction.iconColor}
                         />
                       </Svg>
                       <Text bold style={styles.bottomText}>
-                      {transaction.transactionname}
-                    </Text>
+                        {transaction.transactionname}
+                      </Text>
                     </Block>
                     <Text bold>{transaction.amount}$</Text>
                   </Block>
                   <Block flex row space="between" middle>
-                    <Text style={styles.bottomText}>
-                      {transaction.kindname}
-                    </Text>
-                    <Text>
+                    <Text style={styles.transInfo}>{transaction.kindname}</Text>
+                    <Text style={styles.transInfo}>
                       <ConvertDate transaction={transaction} />
                     </Text>
                   </Block>
@@ -142,12 +178,21 @@ const StatsMore = props => {
 };
 
 const styles = StyleSheet.create({
+  summary: {
+    fontSize: 13,
+  },
   navbar: {
     //marginBottom: 10,
     //position: 'fixed',
   },
+  transInfo: {
+    marginLeft: 12,
+    fontSize: 13,
+    color: '#5d6363',
+  },
   bottomText: {
     fontSize: 15,
+    marginLeft: 5,
   },
   btnSelected: {
     fontWeight: 'bold',
@@ -179,7 +224,7 @@ const styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: 16,
-    color: 'white',
+    color: 'black',
   },
   block: {
     backgroundColor: 'white',
@@ -189,7 +234,6 @@ const styles = StyleSheet.create({
   smallBlock: {
     backgroundColor: 'white',
     paddingVertical: 10,
-    paddingHorizontal: 20,
     width: '100%',
   },
   chartBlock: {

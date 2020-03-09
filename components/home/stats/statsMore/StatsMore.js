@@ -1,7 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 //react
-import React, {useEffect} from 'react';
-import {SafeAreaView, StyleSheet, ScrollView, Dimensions} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  View,
+  TouchableWithoutFeedback,
+} from 'react-native';
 //packages
 import Text from 'galio-framework/src/Text';
 import moment from 'moment';
@@ -45,6 +52,8 @@ const StatsMore = props => {
   //const {httpDispatch, http} = useContext(HttpContext);
   const {data, summary, type} = props.route.params;
   const {navigation} = props;
+  const [showMore, setShowMore] = useState(false);
+
   const ConvertDate = props => {
     const {transaction} = props;
     const date = new Date(transaction.updated_at.timestamp * 1000);
@@ -137,10 +146,12 @@ const StatsMore = props => {
             Transactions
           </Text>
           {data.map(transaction => (
-            <Block key={transaction.id} style={{width: '100%'}} flex>
-              <Block middle row space="between" style={styles.smallBlock}>
-                <Block style={{width: '100%'}} column>
-                  <Block flex row space="between" middle>
+            <TouchableWithoutFeedback
+              key={transaction.id}
+              onLongPress={() => setShowMore(!showMore)}>
+              <Block center flex row>
+                <Block style={[styles.smallBlock]}>
+                  <Block flex row middle>
                     <Block flex row center>
                       <Svg height="8" width="8">
                         <Circle
@@ -156,15 +167,37 @@ const StatsMore = props => {
                     </Block>
                     <Text bold>{transaction.amount}$</Text>
                   </Block>
-                  <Block flex row space="between" middle>
+                  <Block flex row space="between">
                     <Text style={styles.transInfo}>{transaction.kindname}</Text>
                     <Text style={styles.transInfo}>
                       <ConvertDate transaction={transaction} />
                     </Text>
                   </Block>
                 </Block>
+                {showMore && (
+                  <Block style={{marginLeft: 10}} space="around" flex row>
+                    <Button
+                      onlyIcon
+                      icon="edit"
+                      onPress={() => navigation.navigate('StatsAddTransaction')}
+                      iconFamily="Feather"
+                      iconSize={21}
+                      color="transparent"
+                      style={{width: 32, height: 32}}
+                    />
+                    <Button
+                      onlyIcon
+                      icon="trash"
+                      color="transparent"
+                      onPress={() => navigation.navigate('StatsAddTransaction')}
+                      iconFamily="Feather"
+                      iconSize={21}
+                      style={{width: 32, height: 32}}
+                    />
+                  </Block>
+                )}
               </Block>
-            </Block>
+            </TouchableWithoutFeedback>
           ))}
         </Block>
       </SafeAreaView>
@@ -227,9 +260,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   smallBlock: {
-    backgroundColor: 'white',
+    //backgroundColor: 'white',
     paddingVertical: 10,
-    width: '100%',
+    flex: 3,
+    // width: '100%',
   },
   chartBlock: {
     backgroundColor: 'white',
@@ -239,3 +273,26 @@ const styles = StyleSheet.create({
 });
 
 export default StatsMore;
+
+{
+  /* <Block style={{justifyContent: 'flex-end', backgroundColor: 'red'}} flex row>
+<Button
+  onlyIcon
+  icon="add"
+  onPress={() => navigation.navigate('StatsAddTransaction')}
+  iconFamily="MaterialIcons"
+  iconSize={28}
+  iconColor="#fff"
+  style={{width: 32, height: 32}}
+/>
+<Button
+  onlyIcon
+  icon="add"
+  onPress={() => navigation.navigate('StatsAddTransaction')}
+  iconFamily="MaterialIcons"
+  iconSize={28}
+  iconColor="#fff"
+  style={{width: 32, height: 32}}
+/>
+</Block> */
+}

@@ -1,5 +1,10 @@
 import React, {useState} from 'react';
-import {SafeAreaView, StyleSheet, Dimensions} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import {Input, Text} from 'galio-framework/src';
 import RadioForm, {
   RadioButton,
@@ -12,14 +17,27 @@ import {NavBar, Block, Button} from 'galio-framework';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {url} from '../../../env';
+import AwesomeAlert from 'react-native-awesome-alerts';
+
 let radio_props = [{label: 'Income', value: 0}, {label: 'Expense', value: 1}];
 
 const AddTransaction = props => {
   const {navigation} = props;
   const [checkedValue, setCheckedValue] = useState(0);
-  const {handleSubmit, errors, control, setError, clearError} = useForm();
+  const [isLoading, SetIsLoading] = useState(false);
+  const [httpError, setHttpError] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const {
+    handleSubmit,
+    errors,
+    control,
+    setValue,
+    setError,
+    clearError,
+  } = useForm();
 
   const postTransaction = async data => {
+    // SetIsLoading(true);
     let token = await AsyncStorage.getItem('userToken');
     console.log(data);
     const config = {
@@ -33,10 +51,29 @@ const AddTransaction = props => {
         config,
       );
       console.log(response.data);
+      setValue('transactionname', '', false);
+      await setValue('amount', '', false);
       //await httpDispatch({type: 'SET_DATA', data: response.data});
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      if (err.response) {
+        // Request made and server responded
+        // console.log(err.response.data);
+        //console.log(err.response.status);
+        // console.log(err.response.headers);
+        //authDispatch({type: 'AUTH_ERROR', status: err.response.status});
+        setHttpError(true);
+      } else if (err.request) {
+        // The request was made but no response was received
+        setHttpError(true);
+        console.log(err.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setHttpError(true);
+        console.log('Error', err.message);
+      }
     }
+    //SetIsLoading(false);
+    setShowAlert(true);
   };
 
   const onSubmit = async data => {
@@ -101,6 +138,7 @@ const AddTransaction = props => {
         <Controller
           as={
             <Input
+              keyboardType={'numeric'}
               style={errors.amount && {borderColor: 'red'}}
               color={errors.amount && 'red'}
               placeholderTextColor={errors.amount && 'red'}
@@ -151,9 +189,31 @@ const AddTransaction = props => {
         <Button
           onPress={handleSubmit(onSubmit)}
           style={[styles.buttonMargin, styles.buttons]}>
-          Create
+          {isLoading && <ActivityIndicator size="large" color="white" />}
+          {!isLoading && <Text color="white">Create</Text>}
         </Button>
       </Block>
+
+      {!httpError && (
+        <AwesomeAlert
+          show={showAlert}
+          showProgress={false}
+          title={
+            httpError ? 'Something went wrong' : 'Transaction has been added'
+          }
+          message={httpError ? 'Try again' : 'You can add another'}
+          closeOnTouchOutside={true}
+          closeOnHardwareBackPress={false}
+          //showCancelButton={true}
+          showConfirmButton={true}
+          //cancelText="Return"
+          confirmText="Return"
+          confirmButtonColor={httpError ? 'red' : 'green'}
+          onConfirmPressed={() => {
+            setShowAlert(false);
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };

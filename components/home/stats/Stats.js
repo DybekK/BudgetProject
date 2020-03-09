@@ -252,7 +252,7 @@ const Stats = props => {
                 <Text style={styles.bottomText}>Incomes</Text>
                 <Block row center middle>
                   <Text bold h5>
-                    {incomesAmount}$
+                    {incomesAmount.toFixed(2)}$
                   </Text>
                   <IconFeather
                     style={{marginLeft: 9}}

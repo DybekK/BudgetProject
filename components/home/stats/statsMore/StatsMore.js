@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 //react
 import React, {useEffect, useState} from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
 import {
   SafeAreaView,
   StyleSheet,
@@ -23,8 +24,7 @@ import IconIonicons from 'react-native-vector-icons/Ionicons';
 import {LineChart} from 'react-native-chart-kit';
 //project files
 import {HttpContext} from '../../../../App';
-
-// import {url} from '../../../env';
+import {url} from '../../../../env';
 import TopGradient from '../../../../assets/images/TopGradient';
 // import TopGradientHome from '../../../assets/images/TopGradientHome';
 
@@ -52,12 +52,84 @@ const StatsMore = props => {
   //const {httpDispatch, http} = useContext(HttpContext);
   const {data, summary, type} = props.route.params;
   const {navigation} = props;
-  const [showMore, setShowMore] = useState(false);
 
   const ConvertDate = props => {
     const {transaction} = props;
     const date = new Date(transaction.updated_at.timestamp * 1000);
     return moment(date).format('D MMMM HH:mm');
+  };
+
+  const DeleteTransaction = async transactionId => {
+    let token = await AsyncStorage.getItem('userToken');
+
+    const config = {
+      headers: {Authorization: `Bearer ${token}`},
+    };
+
+    try {
+      const response = await axios.delete(
+        `${url}/api/jwt/transaction/${transactionId}`,
+        config,
+      );
+      console.log(response.data);
+      // await httpDispatch({type: 'SET_DATA', data: response.data});
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const TransactionItem = props => {
+    const [showMore, setShowMore] = useState(false);
+    const {transaction} = props;
+    return (
+      <TouchableWithoutFeedback
+        key={transaction.id}
+        onLongPress={() => setShowMore(!showMore)}>
+        <Block center flex row>
+          <Block style={[styles.smallBlock]}>
+            <Block flex row middle>
+              <Block flex row center>
+                <Svg height="8" width="8">
+                  <Circle r="4" cx="4" cy="4" fill={transaction.iconColor} />
+                </Svg>
+                <Text bold style={styles.bottomText}>
+                  {transaction.transactionname}
+                </Text>
+              </Block>
+              <Text bold>{transaction.amount}$</Text>
+            </Block>
+            <Block flex row space="between">
+              <Text style={styles.transInfo}>{transaction.kindname}</Text>
+              <Text style={styles.transInfo}>
+                <ConvertDate transaction={transaction} />
+              </Text>
+            </Block>
+          </Block>
+          {showMore && (
+            <Block style={{marginLeft: 10}} space="around" flex row>
+              <Button
+                onlyIcon
+                icon="edit"
+                onPress={() => navigation.navigate('StatsAddTransaction')}
+                iconFamily="Feather"
+                iconSize={21}
+                color="transparent"
+                style={{width: 32, height: 32}}
+              />
+              <Button
+                onlyIcon
+                icon="trash"
+                color="transparent"
+                onPress={() => DeleteTransaction(transaction.id)}
+                iconFamily="Feather"
+                iconSize={21}
+                style={{width: 32, height: 32}}
+              />
+            </Block>
+          )}
+        </Block>
+      </TouchableWithoutFeedback>
+    );
   };
 
   const Type = () => {
@@ -146,58 +218,59 @@ const StatsMore = props => {
             Transactions
           </Text>
           {data.map(transaction => (
-            <TouchableWithoutFeedback
-              key={transaction.id}
-              onLongPress={() => setShowMore(!showMore)}>
-              <Block center flex row>
-                <Block style={[styles.smallBlock]}>
-                  <Block flex row middle>
-                    <Block flex row center>
-                      <Svg height="8" width="8">
-                        <Circle
-                          r="4"
-                          cx="4"
-                          cy="4"
-                          fill={transaction.iconColor}
-                        />
-                      </Svg>
-                      <Text bold style={styles.bottomText}>
-                        {transaction.transactionname}
-                      </Text>
-                    </Block>
-                    <Text bold>{transaction.amount}$</Text>
-                  </Block>
-                  <Block flex row space="between">
-                    <Text style={styles.transInfo}>{transaction.kindname}</Text>
-                    <Text style={styles.transInfo}>
-                      <ConvertDate transaction={transaction} />
-                    </Text>
-                  </Block>
-                </Block>
-                {showMore && (
-                  <Block style={{marginLeft: 10}} space="around" flex row>
-                    <Button
-                      onlyIcon
-                      icon="edit"
-                      onPress={() => navigation.navigate('StatsAddTransaction')}
-                      iconFamily="Feather"
-                      iconSize={21}
-                      color="transparent"
-                      style={{width: 32, height: 32}}
-                    />
-                    <Button
-                      onlyIcon
-                      icon="trash"
-                      color="transparent"
-                      onPress={() => navigation.navigate('StatsAddTransaction')}
-                      iconFamily="Feather"
-                      iconSize={21}
-                      style={{width: 32, height: 32}}
-                    />
-                  </Block>
-                )}
-              </Block>
-            </TouchableWithoutFeedback>
+            <TransactionItem key={transaction.id} transaction={transaction} />
+            // <TouchableWithoutFeedback
+            //   key={transaction.id}
+            //   onLongPress={() => setShowMore(!showMore)}>
+            //   <Block center flex row>
+            //     <Block style={[styles.smallBlock]}>
+            //       <Block flex row middle>
+            //         <Block flex row center>
+            //           <Svg height="8" width="8">
+            //             <Circle
+            //               r="4"
+            //               cx="4"
+            //               cy="4"
+            //               fill={transaction.iconColor}
+            //             />
+            //           </Svg>
+            //           <Text bold style={styles.bottomText}>
+            //             {transaction.transactionname}
+            //           </Text>
+            //         </Block>
+            //         <Text bold>{transaction.amount}$</Text>
+            //       </Block>
+            //       <Block flex row space="between">
+            //         <Text style={styles.transInfo}>{transaction.kindname}</Text>
+            //         <Text style={styles.transInfo}>
+            //           <ConvertDate transaction={transaction} />
+            //         </Text>
+            //       </Block>
+            //     </Block>
+            //     {showMore && (
+            //       <Block style={{marginLeft: 10}} space="around" flex row>
+            //         <Button
+            //           onlyIcon
+            //           icon="edit"
+            //           onPress={() => navigation.navigate('StatsAddTransaction')}
+            //           iconFamily="Feather"
+            //           iconSize={21}
+            //           color="transparent"
+            //           style={{width: 32, height: 32}}
+            //         />
+            //         <Button
+            //           onlyIcon
+            //           icon="trash"
+            //           color="transparent"
+            //           onPress={() => navigation.navigate('StatsAddTransaction')}
+            //           iconFamily="Feather"
+            //           iconSize={21}
+            //           style={{width: 32, height: 32}}
+            //         />
+            //       </Block>
+            //     )}
+            //   </Block>
+            // </TouchableWithoutFeedback>
           ))}
         </Block>
       </SafeAreaView>

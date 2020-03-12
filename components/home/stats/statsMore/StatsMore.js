@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 //react
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   SafeAreaView,
@@ -13,6 +13,7 @@ import {
 //packages
 import Text from 'galio-framework/src/Text';
 import moment from 'moment';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import {Block, Button, NavBar} from 'galio-framework';
 import Svg, {Circle} from 'react-native-svg';
 import axios from 'axios';
@@ -49,9 +50,14 @@ const chartConfig = {
 
 const StatsMore = props => {
   const {height, width} = Dimensions.get('window');
-  //const {httpDispatch, http} = useContext(HttpContext);
+  const {httpDispatch} = useContext(HttpContext);
   const {data, summary, type} = props.route.params;
   const {navigation} = props;
+  const [transactionData, SetTransactionData] = useState(data);
+  const [httpError, setHttpError] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+
+  console.log(transactionData);
 
   const ConvertDate = props => {
     const {transaction} = props;
@@ -59,28 +65,44 @@ const StatsMore = props => {
     return moment(date).format('D MMMM HH:mm');
   };
 
-  const DeleteTransaction = async transactionId => {
+  const DeleteTransaction = async (transactionId, index) => {
     let token = await AsyncStorage.getItem('userToken');
 
     const config = {
       headers: {Authorization: `Bearer ${token}`},
     };
-
+    console.log(index);
     try {
       const response = await axios.delete(
         `${url}/api/jwt/transaction/${transactionId}`,
         config,
       );
-      console.log(response.data);
-      // await httpDispatch({type: 'SET_DATA', data: response.data});
-    } catch (e) {
-      console.log(e);
+      SetTransactionData(transactionData.splice(index, 1));
+      httpDispatch({type: 'SET_DATA', data: []});
+    } catch (err) {
+      if (err.response) {
+        // Request made and server responded
+        // console.log(err.response.data);
+        //console.log(err.response.status);
+        // console.log(err.response.headers);
+        //authDispatch({type: 'AUTH_ERROR', status: err.response.status});
+        console.log(err.response.data);
+        setHttpError(true);
+      } else if (err.request) {
+        // The request was made but no response was received
+        setHttpError(true);
+        console.log(err.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setHttpError(true);
+        console.log('Error', err.message);
+      }
     }
   };
 
   const TransactionItem = props => {
     const [showMore, setShowMore] = useState(false);
-    const {transaction} = props;
+    const {transaction, index} = props;
     return (
       <TouchableWithoutFeedback
         key={transaction.id}
@@ -120,7 +142,7 @@ const StatsMore = props => {
                 onlyIcon
                 icon="trash"
                 color="transparent"
-                onPress={() => DeleteTransaction(transaction.id)}
+                onPress={() => DeleteTransaction(transaction.id, index)}
                 iconFamily="Feather"
                 iconSize={21}
                 style={{width: 32, height: 32}}
@@ -217,62 +239,34 @@ const StatsMore = props => {
           <Text style={{marginBottom: 10, fontSize: 20}} bold>
             Transactions
           </Text>
-          {data.map(transaction => (
-            <TransactionItem key={transaction.id} transaction={transaction} />
-            // <TouchableWithoutFeedback
-            //   key={transaction.id}
-            //   onLongPress={() => setShowMore(!showMore)}>
-            //   <Block center flex row>
-            //     <Block style={[styles.smallBlock]}>
-            //       <Block flex row middle>
-            //         <Block flex row center>
-            //           <Svg height="8" width="8">
-            //             <Circle
-            //               r="4"
-            //               cx="4"
-            //               cy="4"
-            //               fill={transaction.iconColor}
-            //             />
-            //           </Svg>
-            //           <Text bold style={styles.bottomText}>
-            //             {transaction.transactionname}
-            //           </Text>
-            //         </Block>
-            //         <Text bold>{transaction.amount}$</Text>
-            //       </Block>
-            //       <Block flex row space="between">
-            //         <Text style={styles.transInfo}>{transaction.kindname}</Text>
-            //         <Text style={styles.transInfo}>
-            //           <ConvertDate transaction={transaction} />
-            //         </Text>
-            //       </Block>
-            //     </Block>
-            //     {showMore && (
-            //       <Block style={{marginLeft: 10}} space="around" flex row>
-            //         <Button
-            //           onlyIcon
-            //           icon="edit"
-            //           onPress={() => navigation.navigate('StatsAddTransaction')}
-            //           iconFamily="Feather"
-            //           iconSize={21}
-            //           color="transparent"
-            //           style={{width: 32, height: 32}}
-            //         />
-            //         <Button
-            //           onlyIcon
-            //           icon="trash"
-            //           color="transparent"
-            //           onPress={() => navigation.navigate('StatsAddTransaction')}
-            //           iconFamily="Feather"
-            //           iconSize={21}
-            //           style={{width: 32, height: 32}}
-            //         />
-            //       </Block>
-            //     )}
-            //   </Block>
-            // </TouchableWithoutFeedback>
+          {transactionData.map((transaction, index) => (
+            <TransactionItem
+              key={transaction.id}
+              transaction={transaction}
+              index={index}
+            />
           ))}
         </Block>
+        {!httpError && (
+          <AwesomeAlert
+            show={showAlert}
+            showProgress={false}
+            title={
+              httpError ? 'Something went wrong' : 'Transaction has been added'
+            }
+            message={httpError ? 'Try again' : 'You can add another'}
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            //showCancelButton={true}
+            showConfirmButton={true}
+            //cancelText="Return"
+            confirmText="Return"
+            confirmButtonColor={httpError ? 'red' : 'green'}
+            onConfirmPressed={() => {
+              setShowAlert(false);
+            }}
+          />
+        )}
       </SafeAreaView>
     </ScrollView>
   );

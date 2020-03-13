@@ -77,8 +77,10 @@ const StatsMore = props => {
         `${url}/api/jwt/transaction/${transactionId}`,
         config,
       );
-      SetTransactionData(transactionData.splice(index, 1));
-      httpDispatch({type: 'SET_DATA', data: []});
+      let spliced = [...transactionData];
+      spliced.splice(index, 1);
+      SetTransactionData(spliced);
+      // httpDispatch({type: 'SET_DATA', data: spliced});
     } catch (err) {
       if (err.response) {
         // Request made and server responded

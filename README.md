@@ -7,6 +7,8 @@ An application which helps control the user's budget.
 
 Read [React Native Docs](https://reactnative.dev/docs/getting-started) to install dependencies. Follow the React Native CLI Quickstart.
 
+Then configure `env.js` file, use your local ip and port.
+
 ## Usage
 To run application use:
 

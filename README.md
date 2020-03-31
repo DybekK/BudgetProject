@@ -1,4 +1,4 @@
-# budget-app
+# budget-app-react
 
 
 An application which helps control the user's budget.
